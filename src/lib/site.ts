@@ -3,6 +3,10 @@ export const PHONE_TEL = "+971563641028";
 export const WHATSAPP_NUMBER = "971563641028";
 export const CONTACT_EMAIL = "parilyahansakalye@gmail.com";
 
+export const INSTAGRAM_URL = "https://instagram.com/parilyahansakalye";
+export const FACEBOOK_URL = "https://www.facebook.com/p/Parilyahan-sa-Kalye-61578495824957/";
+export const TIKTOK_URL = "https://www.tiktok.com/@parilyahansakalye";
+
 export const ADDRESS_LINES = [
   "Parilyahan sa Kalye",
   "Ibis Styles Hotel, Ground Floor",

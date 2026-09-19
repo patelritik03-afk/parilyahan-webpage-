@@ -1,4 +1,4 @@
-import { MAPS_URL, WHATSAPP_NUMBER } from "@/lib/site";
+import { FACEBOOK_URL, INSTAGRAM_URL, MAPS_URL, TIKTOK_URL, WHATSAPP_NUMBER } from "@/lib/site";
 
 const iconClass = "h-5 w-5";
 
@@ -16,6 +16,14 @@ function FacebookIcon() {
   return (
     <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M15 8h-2a2 2 0 0 0-2 2v2H9v3h2v7h3v-7h2.2l.8-3H14v-1.5c0-.6.4-1 1-1h1.5V8Z" />
+    </svg>
+  );
+}
+
+function TikTokIcon() {
+  return (
+    <svg className={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
     </svg>
   );
 }
@@ -40,13 +48,12 @@ function MapPinIcon() {
 
 export default function SocialLinks({ className = "" }: { className?: string }) {
   const whatsapp = WHATSAPP_NUMBER;
-  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL;
-  const facebook = process.env.NEXT_PUBLIC_FACEBOOK_URL;
   const maps = MAPS_URL;
 
   const items = [
-    instagram && { href: instagram, label: "Instagram", icon: <InstagramIcon /> },
-    facebook && { href: facebook, label: "Facebook", icon: <FacebookIcon /> },
+    { href: INSTAGRAM_URL, label: "Instagram", icon: <InstagramIcon /> },
+    { href: FACEBOOK_URL, label: "Facebook", icon: <FacebookIcon /> },
+    { href: TIKTOK_URL, label: "TikTok", icon: <TikTokIcon /> },
     whatsapp && {
       href: `https://wa.me/${whatsapp.replace(/\D/g, "")}`,
       label: "WhatsApp",
