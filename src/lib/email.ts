@@ -4,7 +4,14 @@ import type { Reservation } from "./types";
 import type { EnquiryPayload } from "./enquiry";
 import { formatTimeLabel } from "./timeSlots";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | null = null;
+
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  resendClient ??= new Resend(apiKey);
+  return resendClient;
+}
 
 function escapeHtml(value: string) {
   return value
@@ -18,7 +25,9 @@ function escapeHtml(value: string) {
 const row = (label: string, value: string | number | undefined) =>
   value === undefined || value === "" ? "" : `<p><strong>${label}:</strong> ${escapeHtml(String(value))}</p>`;
 
-async function send(options: Parameters<typeof resend.emails.send>[0]) {
+async function send(options: Parameters<Resend["emails"]["send"]>[0]) {
+  const resend = getResend();
+  if (!resend) return false;
   const { error } = await resend.emails.send(options);
   if (error) throw new Error(`Resend: ${error.message}`);
   return true;
