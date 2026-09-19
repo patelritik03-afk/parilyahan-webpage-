@@ -76,6 +76,23 @@ your social links and WhatsApp number.
 **Important:** the `ADMIN_PASSWORD_HASH` value contains `$` characters (bcrypt format).
 Next.js expands `$` in `.env` files, so every `$` in the hash must be escaped as `\$`
 or the password check will silently fail. `.env.local.example` shows the correct format.
+This applies to `.env` **files only** - in the Vercel dashboard, paste the hash exactly as
+generated, with plain `$` signs and no backslashes.
+
+`ADMIN_SESSION_SECRET` must be at least 32 characters of real randomness; the app refuses
+to sign in with anything shorter. Generate one with
+`node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"`.
+
+### 6. Abuse protection
+
+The reservation form, enquiry form and admin login are rate-limited per IP address
+(5 submissions / 10 minutes for the forms, 10 attempts / 15 minutes for login), and both
+public forms carry a hidden honeypot field that silently discards bot submissions.
+
+Out of the box the limits are counted in memory, per server instance. For a reliable
+shared counter in production, create a free Redis database at [upstash.com](https://upstash.com),
+and set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`; the app picks them up
+automatically.
 
 ## Local development
 
@@ -86,11 +103,18 @@ npm run dev
 
 Visit `http://localhost:3000`. Admin panel is at `/admin`.
 
+Before pushing: `npm run lint`, `npm run typecheck` and `npm run build` should all pass.
+
 ## Deployment
 
 Deploy to [Vercel](https://vercel.com): import this repo, add the same environment
-variables from `.env.local` in the Vercel project settings, and deploy. Point your
-purchased domain's DNS at the Vercel project once it's live.
+variables from `.env.local` in the Vercel project settings (see the `$` note above), and
+deploy. Point your purchased domain's DNS at the Vercel project once it's live, then set
+`NEXT_PUBLIC_SITE_URL` to the final address so the sitemap, `robots.txt` and link previews
+use it.
+
+Gallery photos are re-encoded to WebP (max 1600 px) on upload; only JPG, PNG and WebP up
+to 4 MB are accepted. Search engines are told not to index `/admin` or `/api`.
 
 ## Notes for future changes
 
