@@ -1,4 +1,7 @@
-﻿# Parilyahan Sa Kalye â€” Website & Reservation System
+# Parilyahan Sa Kalye — Website & Reservation System
+
+> **Putting the site live?** Start with [GO-LIVE.md](GO-LIVE.md) — a plain-language, step-by-step
+> guide. In Claude Code, type: *"Read GO-LIVE.md and help me go live, one step at a time."*
 
 Next.js site for Parilyahan Sa Kalye: home, about, daily buffet menu, gallery, online
 reservations, and a password-protected admin panel to manage the daily menu, view
@@ -7,9 +10,9 @@ reservations, and manage gallery photos.
 ## Stack
 
 - Next.js (App Router, TypeScript) + Tailwind CSS
-- Supabase (Postgres + Storage) â€” data and photo storage
-- Resend â€” reservation/confirmation emails
-- CallMeBot â€” free WhatsApp notification to the owner's own number
+- Supabase (Postgres + Storage) — data and photo storage
+- Resend — reservation/confirmation emails
+- CallMeBot — free WhatsApp notification to the owner's own number
 - Single-owner admin login (bcrypt password + signed session cookie)
 
 ## One-time setup
@@ -17,11 +20,11 @@ reservations, and manage gallery photos.
 ### 1. Supabase project
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Go to SQL Editor and run [`supabase/schema.sql`](supabase/schema.sql) â€” creates the
+2. Go to SQL Editor and run [`supabase/schema.sql`](supabase/schema.sql) — creates the
    `daily_menu`, `reservations`, `gallery_images` tables and the public `site-images`
    storage bucket.
 3. From Project Settings > API, copy the **Project URL** and the **service_role** key
-   (not the anon key â€” the app only uses the service role key, server-side only).
+   (not the anon key — the app only uses the service role key, server-side only).
 
 ### 2. Resend (emails)
 
@@ -118,9 +121,9 @@ to 4 MB are accepted. Search engines are told not to index `/admin` or `/api`.
 
 ## Notes for future changes
 
-- The daily menu is one row per date in `daily_menu` â€” the admin panel always edits
+- The daily menu is one row per date in `daily_menu` — the admin panel always edits
   today's row.
 - Reservations currently auto-confirm with no capacity limits (`status` and `time`
   columns already exist on `reservations` for when slot/capacity rules are added later).
-- About Us copy and social links are static â€” edit `src/app/about/page.tsx` and the
+- About Us copy and social links are static — edit `src/app/about/page.tsx` and the
   `NEXT_PUBLIC_*` env vars respectively.
