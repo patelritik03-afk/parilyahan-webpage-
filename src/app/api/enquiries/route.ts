@@ -4,7 +4,11 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { sendOwnerEnquiryEmail } from "@/lib/email";
 import { sendOwnerEnquiryWhatsApp } from "@/lib/whatsapp";
 import { logFailures } from "@/lib/notify";
+import { enforceRateLimit } from "@/lib/rateLimit";
+import { isHoneypotFilled, upcomingDateSchema } from "@/lib/validation";
 import type { EnquiryPayload } from "@/lib/enquiry";
+
+const MAX_DAYS_AHEAD = 730;
 
 const common = {
   name: z.string().trim().min(1).max(200),
@@ -19,7 +23,7 @@ const enquirySchema = z.discriminatedUnion("type", [
     type: z.literal("Event"),
     eventType: z.string().trim().min(1).max(120),
     pax: z.number().int().min(1).max(5000),
-    eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    eventDate: upcomingDateSchema(MAX_DAYS_AHEAD, "Please choose an event date from today onwards."),
   }),
   z.object({ ...common, type: z.literal("Marketing collab") }),
   z.object({ ...common, type: z.literal("Partnership") }),
@@ -27,11 +31,18 @@ const enquirySchema = z.discriminatedUnion("type", [
 ]);
 
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null);
-  const parsed = enquirySchema.safeParse(body);
+  const limited = await enforceRateLimit("enquiries", request, { limit: 5, windowSec: 10 * 60 });
+  if (limited) return limited;
 
+  const body = await request.json().catch(() => null);
+  if (isHoneypotFilled(body)) {
+    return NextResponse.json({ ok: true }, { status: 201 });
+  }
+
+  const parsed = enquirySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Please check the form and try again." }, { status: 400 });
+    const message = parsed.error.issues.find((i) => i.path[0] === "eventDate")?.message;
+    return NextResponse.json({ error: message ?? "Please check the form and try again." }, { status: 400 });
   }
 
   const enquiry = parsed.data as EnquiryPayload;

@@ -5,7 +5,8 @@ import { todayISO } from "@/lib/date";
 import { TIME_SLOTS, formatTimeLabel } from "@/lib/timeSlots";
 import { buildPhone } from "@/lib/countryCodes";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { Field, inputClass, labelClass } from "./FormField";
+import { HONEYPOT_FIELD } from "@/lib/validation";
+import { Field, HoneypotField, inputClass, labelClass } from "./FormField";
 import PhoneField from "./PhoneField";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -41,6 +42,7 @@ export default function ReservationForm() {
       time: String(data.time ?? ""),
       party_size: Number(data.party_size ?? 0),
       notes: String(data.notes ?? ""),
+      [HONEYPOT_FIELD]: String(data[HONEYPOT_FIELD] ?? ""),
     };
 
     try {
@@ -87,7 +89,8 @@ export default function ReservationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="relative space-y-5">
+      <HoneypotField name={HONEYPOT_FIELD} />
       <Field label={t("reservation.fullName")} name="name" type="text" required />
       <PhoneField label={t("reservation.phone")} countryLabel={t("enquiry.countryCode")} />
       <Field label={t("reservation.email")} name="email" type="email" required />

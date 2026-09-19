@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import ExcelJS from "exceljs";
+import { requireAdmin } from "@/lib/auth";
 
 const SAMPLE_SECTIONS: { title: string; dishes: string[] }[] = [
   { title: "Starter", dishes: ["Sample starter 1", "Sample starter 2"] },
@@ -65,6 +66,9 @@ async function buildXlsx() {
 }
 
 export async function GET(request: NextRequest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const format = request.nextUrl.searchParams.get("format");
 
   if (format === "csv") {

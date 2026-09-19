@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
+import { requireAdmin } from "@/lib/auth";
+import { isoDateSchema } from "@/lib/validation";
 
 const bulkSchema = z.object({
   menus: z
     .array(
       z.object({
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        date: isoDateSchema,
         items: z.array(
           z.object({
             category: z.string().trim().min(1).max(100),
@@ -21,6 +23,9 @@ const bulkSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const body = await request.json().catch(() => null);
   const parsed = bulkSchema.safeParse(body);
 

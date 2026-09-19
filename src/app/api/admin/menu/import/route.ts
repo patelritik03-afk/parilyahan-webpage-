@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseMenuFile } from "@/lib/menuImport";
+import { requireAdmin } from "@/lib/auth";
 
-const MAX_BYTES = 5 * 1024 * 1024;
+// Vercel serverless functions reject request bodies above 4.5 MB.
+const MAX_BYTES = 4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const formData = await request.formData().catch(() => null);
   const file = formData?.get("file");
 
@@ -14,7 +19,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Please upload an .xlsx or .csv file." }, { status: 400 });
   }
   if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: "File is too large (max 5 MB)." }, { status: 400 });
+    return NextResponse.json({ error: "File is too large (max 4 MB)." }, { status: 400 });
   }
 
   try {

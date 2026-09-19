@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
+import { SITE_URL } from "@/lib/siteUrl";
 import "./globals.css";
 
 const body = Plus_Jakarta_Sans({
@@ -18,10 +19,21 @@ const display = Poppins({
 
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "Parilyahan Sa Kalye";
 
+const title = `${siteName} | Filipino Daily Buffet in Dubai`;
+const description = "Filipino street-style daily buffet in Dubai. See today's menu and reserve your table online.";
+
 export const metadata: Metadata = {
-  title: `${siteName} | Filipino Daily Buffet in Dubai`,
-  description:
-    "Filipino street-style daily buffet in Dubai. See today's menu and reserve your table online.",
+  metadataBase: new URL(SITE_URL),
+  title,
+  description,
+  openGraph: {
+    type: "website",
+    siteName,
+    title,
+    description,
+    images: [{ url: "/images/hero-buffet.webp", width: 2000, height: 1333, alt: siteName }],
+  },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
+import { requireAdmin } from "@/lib/auth";
+import { isoDateSchema } from "@/lib/validation";
 import { todayISO } from "@/lib/date";
-
-const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 const itemSchema = z.object({
   category: z.string().trim().min(1).max(100),
@@ -12,13 +12,16 @@ const itemSchema = z.object({
 });
 
 const putSchema = z.object({
-  date: dateSchema,
+  date: isoDateSchema,
   items: z.array(itemSchema),
 });
 
 export async function GET(request: NextRequest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const dateParam = request.nextUrl.searchParams.get("date");
-  const date = dateParam && dateSchema.safeParse(dateParam).success ? dateParam : todayISO();
+  const date = dateParam && isoDateSchema.safeParse(dateParam).success ? dateParam : todayISO();
 
   const { data, error } = await supabaseAdmin
     .from("daily_menu")
@@ -34,6 +37,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
   const body = await request.json().catch(() => null);
   const parsed = putSchema.safeParse(body);
 

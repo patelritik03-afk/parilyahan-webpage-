@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const COOKIE_NAME = "psk_admin_session";
+const MIN_SECRET_LENGTH = 32;
 
-function getSecretKey() {
-  return new TextEncoder().encode(process.env.ADMIN_SESSION_SECRET);
+async function hasValidSession(token: string | undefined) {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!token || !secret || secret.length < MIN_SECRET_LENGTH) return false;
+  try {
+    await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function proxy(request: NextRequest) {
@@ -13,18 +21,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(COOKIE_NAME)?.value;
-  const isApiRoute = pathname.startsWith("/api/");
+  if (await hasValidSession(request.cookies.get(COOKIE_NAME)?.value)) {
+    return NextResponse.next();
+  }
 
-  const valid = token
-    ? await jwtVerify(token, getSecretKey())
-        .then(() => true)
-        .catch(() => false)
-    : false;
-
-  if (valid) return NextResponse.next();
-
-  if (isApiRoute) {
+  if (pathname.startsWith("/api/")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   return NextResponse.redirect(new URL("/admin", request.url));

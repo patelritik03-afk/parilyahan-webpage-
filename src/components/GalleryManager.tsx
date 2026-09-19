@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
 
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+
 export default function GalleryManager() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,8 +29,13 @@ export default function GalleryManager() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
     setError("");
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError("Photo is too large (max 4 MB). Please resize it and try again.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    setUploading(true);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -38,7 +45,8 @@ export default function GalleryManager() {
     if (res.ok) {
       loadImages();
     } else {
-      setError("Upload failed. Please try again.");
+      const body = await res.json().catch(() => ({}));
+      setError(body.error ?? "Upload failed. Please try again.");
     }
 
     setUploading(false);
@@ -58,7 +66,7 @@ export default function GalleryManager() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             className="hidden"
             onChange={handleUpload}
             disabled={uploading}

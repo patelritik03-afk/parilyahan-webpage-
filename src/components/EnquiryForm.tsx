@@ -5,7 +5,8 @@ import { todayISO } from "@/lib/date";
 import { buildPhone } from "@/lib/countryCodes";
 import { ENQUIRY_TYPES, EVENT_TYPES } from "@/lib/enquiry";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { Field, inputClass, labelClass } from "./FormField";
+import { HONEYPOT_FIELD } from "@/lib/validation";
+import { Field, HoneypotField, inputClass, labelClass } from "./FormField";
 import PhoneField from "./PhoneField";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -35,6 +36,7 @@ export default function EnquiryForm() {
       email: String(data.email ?? ""),
       type,
       message: String(data.message ?? ""),
+      [HONEYPOT_FIELD]: String(data[HONEYPOT_FIELD] ?? ""),
     };
     if (type === "Other") payload.specify = String(data.specify ?? "");
     if (type === "Event") {
@@ -80,7 +82,8 @@ export default function EnquiryForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="relative space-y-5">
+      <HoneypotField name={HONEYPOT_FIELD} />
       <Field label={t("reservation.fullName")} name="name" type="text" required />
       <PhoneField label={t("reservation.phone")} countryLabel={t("enquiry.countryCode")} />
       <Field label={t("reservation.email")} name="email" type="email" required />

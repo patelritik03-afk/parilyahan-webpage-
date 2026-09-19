@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { requireAdmin } from "@/lib/auth";
+import { isoDateSchema } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
-  const date = request.nextUrl.searchParams.get("date");
+  const denied = await requireAdmin();
+  if (denied) return denied;
+
+  const dateParam = request.nextUrl.searchParams.get("date");
+  const date = dateParam && isoDateSchema.safeParse(dateParam).success ? dateParam : null;
 
   let query = supabaseAdmin
     .from("reservations")

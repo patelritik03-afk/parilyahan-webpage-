@@ -1,19 +1,24 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 const COOKIE_NAME = "psk_admin_session";
 const SESSION_DURATION = "7d";
+const ALG = "HS256";
+export const MIN_SECRET_LENGTH = 32;
 
 function getSecretKey() {
   const secret = process.env.ADMIN_SESSION_SECRET;
-  if (!secret) throw new Error("ADMIN_SESSION_SECRET is not set");
+  if (!secret || secret.length < MIN_SECRET_LENGTH) {
+    throw new Error(`ADMIN_SESSION_SECRET must be set and at least ${MIN_SECRET_LENGTH} characters long`);
+  }
   return new TextEncoder().encode(secret);
 }
 
 export async function createAdminSession() {
   const token = await new SignJWT({ role: "admin" })
-    .setProtectedHeader({ alg: "HS256" })
+    .setProtectedHeader({ alg: ALG })
     .setIssuedAt()
     .setExpirationTime(SESSION_DURATION)
     .sign(getSecretKey());
@@ -36,7 +41,7 @@ export async function clearAdminSession() {
 export async function verifyAdminSessionToken(token: string | undefined) {
   if (!token) return false;
   try {
-    await jwtVerify(token, getSecretKey());
+    await jwtVerify(token, getSecretKey(), { algorithms: [ALG] });
     return true;
   } catch {
     return false;
@@ -47,6 +52,12 @@ export async function isAdminAuthenticated() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   return verifyAdminSessionToken(token);
+}
+
+// Every /api/admin handler calls this first so the proxy is not the only gate.
+export async function requireAdmin() {
+  if (await isAdminAuthenticated()) return null;
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 
 export const ADMIN_COOKIE_NAME = COOKIE_NAME;
