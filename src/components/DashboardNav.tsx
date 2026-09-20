@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ const tabs = [
   { href: "/admin/dashboard/enquiries", label: "Enquiries" },
   { href: "/admin/dashboard/gallery", label: "Gallery" },
   { href: "/admin/dashboard/reviews", label: "Reviews" },
+  { href: "/admin/dashboard/about", label: "About Us" },
   { href: "/admin/dashboard/settings", label: "Settings" },
 ];
 
