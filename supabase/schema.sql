@@ -70,6 +70,17 @@ create table if not exists admin_settings (
 
 alter table admin_settings enable row level security;
 
+-- TikTok videos shown on the Videos page and the home page (added by pasting links in the dashboard).
+create table if not exists videos (
+  id uuid primary key default gen_random_uuid(),
+  video_id text not null unique,
+  url text not null,
+  title text,
+  author text,
+  created_at timestamptz not null default now()
+);
+
+alter table videos enable row level security;
 -- Storage bucket for gallery + menu item photos, served publicly by URL.
 insert into storage.buckets (id, name, public)
 values ('site-images', 'site-images', true)

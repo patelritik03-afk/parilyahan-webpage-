@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -13,6 +13,7 @@ const links: { href: string; key: TranslationKey }[] = [
   { href: "/menu", key: "nav.menu" },
   { href: "/about", key: "nav.about" },
   { href: "/gallery", key: "nav.gallery" },
+  { href: "/videos", key: "nav.videos" },
   { href: "/enquiries", key: "nav.enquiries" },
 ];
 

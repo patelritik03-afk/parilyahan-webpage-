@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/siteUrl";
 
 const PAGES: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
@@ -6,6 +6,7 @@ const PAGES: { path: string; priority: number; changeFrequency: MetadataRoute.Si
   { path: "/menu", priority: 0.9, changeFrequency: "daily" },
   { path: "/reservation", priority: 0.9, changeFrequency: "monthly" },
   { path: "/gallery", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/videos", priority: 0.6, changeFrequency: "weekly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
   { path: "/enquiries", priority: 0.6, changeFrequency: "monthly" },
 ];

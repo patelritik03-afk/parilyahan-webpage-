@@ -1,10 +1,11 @@
-export const en = {
+﻿export const en = {
   "nav.home": "Home",
   "nav.menu": "Menu",
   "nav.about": "About Us",
   "nav.gallery": "Gallery",
   "nav.reserve": "Reserve a Table",
   "nav.enquiries": "Enquiries",
+  "nav.videos": "Videos",
 
   "enquiry.eyebrow": "Get in touch",
   "enquiry.title": "Enquiries",
@@ -45,7 +46,7 @@ export const en = {
 
   "reviews.eyebrow": "Guest reviews",
   "reviews.title": "What our guests say",
-  "reviews.summary": "{rating} on Google · {count} reviews",
+  "reviews.summary": "{rating} on Google Â· {count} reviews",
   "reviews.write": "Write a review on Google",
   "reviews.readAll": "See all reviews on Google",
   "reviews.empty": "No reviews yet - be the first to share your experience!",
@@ -54,10 +55,16 @@ export const en = {
   "reviews.next": "Next review",
   "reviews.goTo": "Go to review",
 
-  "home.hours": "Open daily · 1 PM - 10 PM",
+  "home.hours": "Open daily Â· 1 PM - 10 PM",
   "home.tasteEyebrow": "From our kitchen",
   "home.tasteTitle": "A taste of the buffet",
   "home.tasteLink": "See the full gallery",
+  "videos.eyebrow": "Fresh from TikTok",
+  "videos.title": "Our Latest Videos",
+  "videos.subtitle": "See what is cooking at Parilyahan Sa Kalye.",
+  "videos.follow": "Follow us on TikTok",
+  "videos.all": "See all videos",
+  "videos.empty": "New videos are coming soon.",
   "home.ctaTitle": "Ready for a Filipino feast?",
   "home.ctaBody": "Grab a table for lunch or dinner - we'll have the grill going.",
 
@@ -126,6 +133,7 @@ export const tl: Record<TranslationKey, string> = {
   "nav.gallery": "Gallery",
   "nav.reserve": "Mag-reserve ng Mesa",
   "nav.enquiries": "Mga Katanungan",
+  "nav.videos": "Mga Video",
 
   "enquiry.eyebrow": "Makipag-ugnayan",
   "enquiry.title": "Mga Katanungan",
@@ -166,7 +174,7 @@ export const tl: Record<TranslationKey, string> = {
 
   "reviews.eyebrow": "Mga review ng bisita",
   "reviews.title": "Ano ang sabi ng aming mga bisita",
-  "reviews.summary": "{rating} sa Google · {count} review",
+  "reviews.summary": "{rating} sa Google Â· {count} review",
   "reviews.write": "Mag-review sa Google",
   "reviews.readAll": "Tingnan ang lahat ng review sa Google",
   "reviews.empty": "Wala pang review - kayo na po ang mauna!",
@@ -175,10 +183,16 @@ export const tl: Record<TranslationKey, string> = {
   "reviews.next": "Susunod na review",
   "reviews.goTo": "Pumunta sa review",
 
-  "home.hours": "Bukas araw-araw · 1 PM - 10 PM",
+  "home.hours": "Bukas araw-araw Â· 1 PM - 10 PM",
   "home.tasteEyebrow": "Mula sa aming kusina",
   "home.tasteTitle": "Tikman ang buffet",
   "home.tasteLink": "Tingnan ang buong gallery",
+  "videos.eyebrow": "Bago sa TikTok",
+  "videos.title": "Ang Aming Mga Bagong Video",
+  "videos.subtitle": "Tingnan kung ano ang niluluto sa Parilyahan Sa Kalye.",
+  "videos.follow": "I-follow kami sa TikTok",
+  "videos.all": "Tingnan ang lahat ng video",
+  "videos.empty": "Malapit nang dumating ang mga bagong video.",
   "home.ctaTitle": "Handa na ba kayo sa Filipino salu-salo?",
   "home.ctaBody": "Mag-reserve ng mesa para sa tanghalian o hapunan - nakasalang na ang ihawan.",
 

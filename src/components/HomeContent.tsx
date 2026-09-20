@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -6,6 +6,7 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { STATIC_GALLERY } from "@/lib/galleryData";
 import type { ReviewData } from "@/lib/reviews";
 import ReviewsSection from "./ReviewsSection";
+import VideoGrid from "./VideoGrid";
 
 const FEATURED = ["Busog Lusog", "Kare Kare", "Grilled Chicken Feet", "Adobong Alimango", "Lumpiang Shanghai", "Chicken Inasal"];
 
@@ -19,7 +20,7 @@ const icons = [
   <path key="c" d="M3 11h18M5 11a7 7 0 0 1 14 0M4 15h16l-1.5 5h-13L4 15Z" />,
 ];
 
-export default function HomeContent({ reviews }: { reviews: ReviewData }) {
+export default function HomeContent({ reviews, videoIds = [] }: { reviews: ReviewData; videoIds?: string[] }) {
   const { t } = useLanguage();
 
   const features = [
@@ -92,7 +93,7 @@ export default function HomeContent({ reviews }: { reviews: ReviewData }) {
             <h2 className="mt-2 font-display text-3xl font-bold">{t("home.tasteTitle")}</h2>
           </div>
           <Link href="/gallery" className="text-sm font-semibold text-primary hover:underline">
-            {t("home.tasteLink")} →
+            {t("home.tasteLink")} â†’
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -118,6 +119,27 @@ export default function HomeContent({ reviews }: { reviews: ReviewData }) {
           ))}
         </div>
       </section>
+
+      {videoIds.length > 0 && (
+        <section className="bg-surface">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="font-display text-sm font-semibold uppercase tracking-widest text-primary">
+                  {t("videos.eyebrow")}
+                </p>
+                <h2 className="mt-2 font-display text-3xl font-bold">{t("videos.title")}</h2>
+              </div>
+              <Link href="/videos" className="text-sm font-semibold text-primary hover:underline">
+                {t("videos.all")} &rarr;
+              </Link>
+            </div>
+            <div className="mt-8">
+              <VideoGrid videoIds={videoIds} />
+            </div>
+          </div>
+        </section>
+      )}
 
       <ReviewsSection data={reviews} />
 
