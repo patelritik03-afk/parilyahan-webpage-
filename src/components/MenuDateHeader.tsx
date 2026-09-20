@@ -1,22 +1,21 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { todayISO } from "@/lib/date";
 import PageBanner from "./PageBanner";
 
-export default function MenuDateHeader({ date }: { date: string }) {
+export default function MenuDateHeader({ date, today }: { date: string; today: string }) {
   const { t, lang } = useLanguage();
   const router = useRouter();
   const [selected, setSelected] = useState(date);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    router.push(`/menu?date=${selected}`);
+    router.push(`/menu?date=${selected < today ? today : selected}`);
   }
 
-  const isToday = date === todayISO();
+  const isToday = date === today;
   const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString(lang === "tl" ? "fil-PH" : "en-US", {
     weekday: "long",
     month: "long",
@@ -39,6 +38,7 @@ export default function MenuDateHeader({ date }: { date: string }) {
           <input
             id="menu-date-picker"
             type="date"
+            min={today}
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
             className="mt-1 rounded-md border border-white/30 bg-white/10 px-3 py-2 text-sm text-white [color-scheme:dark] focus:border-accent focus:outline-none"

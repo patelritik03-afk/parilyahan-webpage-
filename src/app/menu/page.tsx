@@ -1,3 +1,4 @@
+﻿import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase";
 import MenuDisplay from "@/components/MenuDisplay";
 import MenuDateHeader from "@/components/MenuDateHeader";
@@ -15,7 +16,10 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 export default async function MenuPage({ searchParams }: PageProps<"/menu">) {
   const params = await searchParams;
   const requested = typeof params.date === "string" ? params.date : undefined;
-  const date = requested && DATE_RE.test(requested) ? requested : todayISO();
+  const today = todayISO();
+  // Customers can see today's menu and upcoming days, never past ones.
+  if (requested && DATE_RE.test(requested) && requested < today) redirect("/menu");
+  const date = requested && DATE_RE.test(requested) ? requested : today;
 
   const { data } = await supabaseAdmin
     .from("daily_menu")
@@ -27,7 +31,7 @@ export default async function MenuPage({ searchParams }: PageProps<"/menu">) {
 
   return (
     <>
-      <MenuDateHeader date={date} />
+      <MenuDateHeader date={date} today={today} />
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
         <MenuDisplay items={items} />
       </div>
