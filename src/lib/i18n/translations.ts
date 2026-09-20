@@ -1,4 +1,4 @@
-﻿export const en = {
+export const en = {
   "nav.home": "Home",
   "nav.menu": "Menu",
   "nav.about": "About Us",
@@ -46,7 +46,7 @@
 
   "reviews.eyebrow": "Guest reviews",
   "reviews.title": "What our guests say",
-  "reviews.summary": "{rating} on Google Â· {count} reviews",
+  "reviews.summary": "{rating} on Google \u00b7 {count} reviews",
   "reviews.write": "Write a review on Google",
   "reviews.readAll": "See all reviews on Google",
   "reviews.empty": "No reviews yet - be the first to share your experience!",
@@ -55,7 +55,7 @@
   "reviews.next": "Next review",
   "reviews.goTo": "Go to review",
 
-  "home.hours": "Open daily Â· 1 PM - 10 PM",
+  "home.hours": "Open daily \u00b7 1 PM - 10 PM",
   "home.tasteEyebrow": "From our kitchen",
   "home.tasteTitle": "A taste of the buffet",
   "home.tasteLink": "See the full gallery",
@@ -174,7 +174,7 @@ export const tl: Record<TranslationKey, string> = {
 
   "reviews.eyebrow": "Mga review ng bisita",
   "reviews.title": "Ano ang sabi ng aming mga bisita",
-  "reviews.summary": "{rating} sa Google Â· {count} review",
+  "reviews.summary": "{rating} sa Google \u00b7 {count} review",
   "reviews.write": "Mag-review sa Google",
   "reviews.readAll": "Tingnan ang lahat ng review sa Google",
   "reviews.empty": "Wala pang review - kayo na po ang mauna!",
@@ -183,7 +183,7 @@ export const tl: Record<TranslationKey, string> = {
   "reviews.next": "Susunod na review",
   "reviews.goTo": "Pumunta sa review",
 
-  "home.hours": "Bukas araw-araw Â· 1 PM - 10 PM",
+  "home.hours": "Bukas araw-araw \u00b7 1 PM - 10 PM",
   "home.tasteEyebrow": "Mula sa aming kusina",
   "home.tasteTitle": "Tikman ang buffet",
   "home.tasteLink": "Tingnan ang buong gallery",

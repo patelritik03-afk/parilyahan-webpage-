@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -93,7 +93,7 @@ export default function HomeContent({ reviews, videoIds = [] }: { reviews: Revie
             <h2 className="mt-2 font-display text-3xl font-bold">{t("home.tasteTitle")}</h2>
           </div>
           <Link href="/gallery" className="text-sm font-semibold text-primary hover:underline">
-            {t("home.tasteLink")} â†’
+            {t("home.tasteLink")} &rarr;
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3">
