@@ -1,6 +1,7 @@
 import "server-only";
 import ExcelJS from "exceljs";
 import type { MenuItem } from "./types";
+import { MENU_SECTIONS } from "./menuSections";
 
 export type ImportedMenu = { date: string; items: MenuItem[]; source: string };
 export type ImportResult = { menus: ImportedMenu[]; warnings: string[] };
@@ -33,7 +34,8 @@ function toIsoDate(y: number, m: number, d: number): string | null {
   return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
-function parseDateText(text: string): string | null {
+function parseDateText(raw: string): string | null {
+  const text = raw.replace(/^["'\s]+|["'\s]+$/g, "");
   const iso = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if (iso) return toIsoDate(+iso[1], +iso[2], +iso[3]);
   const dmy = text.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/);
@@ -129,8 +131,35 @@ function parseFlatSheet(name: string, grid: Grid): ImportedMenu[] | null {
   return [...byDate.entries()].map(([date, items]) => ({ date, items, source: name }));
 }
 
+const headingKey = (text: string) =>
+  text.toLowerCase().replace(/:$/, "").replace(/\s*\([^)]*\)$/, "").replace(/\s+/g, " ").trim();
+
+const KNOWN_HEADINGS = new Map<string, string>(
+  MENU_SECTIONS.flatMap((section) => {
+    const key = headingKey(section);
+    return [[key, section], [`${key}s`, section]] as [string, string][];
+  })
+);
+
+// Headings are recognised by name (Starter, Soup, Main Course, Rice...), so they work
+// even when the sheet has no empty row between one section and the next.
+function columnToItemsByHeading(cells: string[]): MenuItem[] | null {
+  if (!cells.some((cell) => KNOWN_HEADINGS.has(headingKey(cell)))) return null;
+  const items: MenuItem[] = [];
+  let category = "";
+  for (const cell of cells) {
+    if (!cell) continue;
+    const heading = KNOWN_HEADINGS.get(headingKey(cell));
+    if (heading) category = heading;
+    else if (category) items.push({ category, name: cell.slice(0, 200), description: "" });
+  }
+  return items;
+}
+
 // A run of 2+ filled cells = heading followed by dishes. A lone cell is a dish under the previous heading.
 function columnToItems(cells: string[]): MenuItem[] {
+  const byHeading = columnToItemsByHeading(cells);
+  if (byHeading) return byHeading;
   const items: MenuItem[] = [];
   let category = "";
   let i = 0;

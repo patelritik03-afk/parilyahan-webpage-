@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createAdminSession } from "@/lib/auth";
 import { enforceRateLimit } from "@/lib/rateLimit";
+import { getPasswordHash } from "@/lib/adminPassword";
 
 export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit("login", request, { limit: 10, windowSec: 15 * 60 });
@@ -13,9 +14,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Password is required" }, { status: 400 });
   }
 
-  const hash = process.env.ADMIN_PASSWORD_HASH;
+  const hash = await getPasswordHash();
   if (!hash) {
-    console.error("ADMIN_PASSWORD_HASH is not set");
+    console.error("No admin password is configured");
     return NextResponse.json({ error: "Not configured" }, { status: 500 });
   }
 

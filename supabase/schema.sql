@@ -1,4 +1,4 @@
--- Run this once in your Supabase project's SQL Editor (Database > SQL Editor > New query).
+﻿-- Run this once in your Supabase project's SQL Editor (Database > SQL Editor > New query).
 -- All access from the app goes through the service role key on the server, so RLS is enabled
 -- with no public policies: the anon/public key gets no access to these tables at all.
 
@@ -60,6 +60,15 @@ alter table reviews enable row level security;
 alter table daily_menu enable row level security;
 alter table reservations enable row level security;
 alter table gallery_images enable row level security;
+
+-- Admin settings (the dashboard stores a changed admin password hash here).
+create table if not exists admin_settings (
+  key text primary key,
+  value text not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table admin_settings enable row level security;
 
 -- Storage bucket for gallery + menu item photos, served publicly by URL.
 insert into storage.buckets (id, name, public)
