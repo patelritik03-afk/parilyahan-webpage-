@@ -81,6 +81,19 @@ create table if not exists videos (
 );
 
 alter table videos enable row level security;
+-- Offers and pricing shown on the home page (managed from the dashboard's Offers tab).
+create table if not exists offers (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  price numeric(10,2) not null check (price >= 0),
+  note text,
+  description text,
+  active boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table offers enable row level security;
 -- Storage bucket for gallery + menu item photos, served publicly by URL.
 insert into storage.buckets (id, name, public)
 values ('site-images', 'site-images', true)

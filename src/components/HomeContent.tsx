@@ -6,7 +6,9 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { STATIC_GALLERY } from "@/lib/galleryData";
 import type { ReviewData } from "@/lib/reviews";
 import ReviewsSection from "./ReviewsSection";
+import OffersSection from "./OffersSection";
 import VideoGrid from "./VideoGrid";
+import type { Offer } from "@/lib/offers";
 
 const FEATURED = ["Busog Lusog", "Kare Kare", "Grilled Chicken Feet", "Adobong Alimango", "Lumpiang Shanghai", "Chicken Inasal"];
 
@@ -20,7 +22,15 @@ const icons = [
   <path key="c" d="M3 11h18M5 11a7 7 0 0 1 14 0M4 15h16l-1.5 5h-13L4 15Z" />,
 ];
 
-export default function HomeContent({ reviews, videoIds = [] }: { reviews: ReviewData; videoIds?: string[] }) {
+export default function HomeContent({
+  reviews,
+  videoIds = [],
+  offers = [],
+}: {
+  reviews: ReviewData;
+  videoIds?: string[];
+  offers?: Offer[];
+}) {
   const { t } = useLanguage();
 
   const features = [
@@ -67,6 +77,8 @@ export default function HomeContent({ reviews, videoIds = [] }: { reviews: Revie
           </div>
         </div>
       </section>
+
+      <OffersSection offers={offers} />
 
       <section className="bg-surface">
         <div className="mx-auto grid max-w-6xl gap-6 px-4 py-16 sm:px-6 md:grid-cols-3">
