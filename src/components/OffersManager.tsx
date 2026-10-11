@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Offer } from "@/lib/offers";
@@ -75,7 +75,7 @@ export default function OffersManager() {
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className={inputClass} />
           </label>
           <label className="text-sm font-medium text-foreground/80">
-            Price (AED)
+            Price (AED) - enter 0 for a free offer
             <input required type="number" min={0} step="0.01" value={form.price}
               onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} className={inputClass} />
           </label>
@@ -106,7 +106,7 @@ export default function OffersManager() {
             <li key={offer.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
               <div className={offer.active ? "" : "opacity-50"}>
                 <p className="font-medium">
-                  {offer.title} - AED {offer.price}
+                  {offer.title} - {offer.price > 0 ? `AED ${offer.price}` : "FREE"}
                 </p>
                 {offer.note && <p className="text-xs text-muted">{offer.note}</p>}
               </div>
