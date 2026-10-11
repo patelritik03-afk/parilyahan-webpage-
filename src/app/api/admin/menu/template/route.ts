@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+﻿import { NextRequest } from "next/server";
 import ExcelJS from "exceljs";
 import { requireAdmin } from "@/lib/auth";
 
@@ -9,7 +9,7 @@ const SAMPLE_SECTIONS: { title: string; dishes: string[] }[] = [
   { title: "Noodles", dishes: ["Sample noodles"] },
   { title: "Main Course", dishes: ["Sample main 1", "Sample main 2", "Sample main 3"] },
   { title: "Rice", dishes: ["Steamed Rice"] },
-  { title: "Special Dish", dishes: ["Sample special dish"] },
+  { title: "Special Dishes", dishes: ["Sample special dish"] },
   { title: "Dessert", dishes: ["Sample dessert 1", "Sample dessert 2"] },
   { title: "Ice Cream", dishes: ["Soft Ice Cream (Flavored)"] },
   { title: "Drinks", dishes: ["Ice Tea", "Gulaman drinks"] },

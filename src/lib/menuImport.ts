@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 import ExcelJS from "exceljs";
 import type { MenuItem } from "./types";
 import { MENU_SECTIONS } from "./menuSections";
@@ -53,7 +53,7 @@ function parseCsv(input: string): string[][] {
   let row: string[] = [];
   let field = "";
   let quoted = false;
-  const text = input.replace(/^﻿/, "");
+  const text = input.replace(/^ï»¿/, "");
 
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
@@ -134,12 +134,19 @@ function parseFlatSheet(name: string, grid: Grid): ImportedMenu[] | null {
 const headingKey = (text: string) =>
   text.toLowerCase().replace(/:$/, "").replace(/\s*\([^)]*\)$/, "").replace(/\s+/g, " ").trim();
 
-const KNOWN_HEADINGS = new Map<string, string>(
-  MENU_SECTIONS.flatMap((section) => {
+// Other spellings of a heading that should land in the same section.
+const HEADING_ALIASES: [string, string][] = [
+  ["special dish", "Special Dishes"],
+  ["specials", "Special Dishes"],
+];
+
+const KNOWN_HEADINGS = new Map<string, string>([
+  ...MENU_SECTIONS.flatMap((section) => {
     const key = headingKey(section);
     return [[key, section], [`${key}s`, section]] as [string, string][];
-  })
-);
+  }),
+  ...HEADING_ALIASES,
+]);
 
 // Headings are recognised by name (Starter, Soup, Main Course, Rice...), so they work
 // even when the sheet has no empty row between one section and the next.

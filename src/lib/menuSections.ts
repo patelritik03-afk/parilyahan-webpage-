@@ -1,4 +1,4 @@
-import type { MenuItem } from "./types";
+﻿import type { MenuItem } from "./types";
 
 export const MENU_SECTIONS = [
   "Starter",
@@ -9,7 +9,7 @@ export const MENU_SECTIONS = [
   "International Main Course",
   "Rice",
   "Best Dishes",
-  "Special Dish",
+  "Special Dishes",
   "Dessert",
   "Ice Cream",
   "Drinks",
