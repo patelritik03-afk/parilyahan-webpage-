@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { todayISO } from "@/lib/date";
 import { MENU_SECTIONS, groupsToItems, itemsToGroups, type MenuGroup } from "@/lib/menuSections";
+import MenuPosterPanel from "./MenuPosterPanel";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -15,13 +16,18 @@ export default function MenuEditor() {
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [message, setMessage] = useState("");
+  // Set once a menu exists in the database for this date; it keys the poster preview.
+  const [posterVersion, setPosterVersion] = useState<number | null>(null);
 
   useEffect(() => {
     Promise.resolve()
       .then(() => setLoading(true))
       .then(() => fetch(`/api/admin/menu?date=${date}`))
       .then((res) => res.json())
-      .then((data) => setGroups(itemsToGroups(data.items ?? [])))
+      .then((data) => {
+        setGroups(itemsToGroups(data.items ?? []));
+        setPosterVersion(data.items?.length && data.updated_at ? Date.parse(data.updated_at) : null);
+      })
       .finally(() => setLoading(false));
   }, [date]);
 
@@ -78,6 +84,7 @@ export default function MenuEditor() {
 
     if (res.ok) {
       setGroups(itemsToGroups(items));
+      setPosterVersion(items.length > 0 ? Date.now() : null);
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
     } else {
@@ -211,6 +218,13 @@ export default function MenuEditor() {
             {saveStatus === "saved" && <span className="text-sm text-green-600">Saved!</span>}
             {saveStatus === "error" && <span className="text-sm text-red-600">{message}</span>}
           </div>
+
+          {posterVersion !== null && (
+            <div>
+              <MenuPosterPanel key={`${date}-${posterVersion}`} date={date} version={posterVersion} />
+              <p className="mt-2 text-xs text-muted">The poster shows the last saved menu. Save again to update it.</p>
+            </div>
+          )}
         </>
       )}
     </div>

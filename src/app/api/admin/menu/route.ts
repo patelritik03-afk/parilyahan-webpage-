@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from("daily_menu")
-    .select("items")
+    .select("items, updated_at")
     .eq("date", date)
     .maybeSingle();
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Could not load menu" }, { status: 500 });
   }
 
-  return NextResponse.json({ date, items: data?.items ?? [] });
+  return NextResponse.json({ date, items: data?.items ?? [], updated_at: data?.updated_at ?? null });
 }
 
 export async function PUT(request: NextRequest) {

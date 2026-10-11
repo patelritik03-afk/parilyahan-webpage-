@@ -19,6 +19,7 @@ export default function MenuUploader() {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const [imported, setImported] = useState<{ dates: string[]; version: number } | null>(null);
 
   const today = todayISO();
 
@@ -30,6 +31,7 @@ export default function MenuUploader() {
     setMessage("");
     setMenus([]);
     setWarnings([]);
+    setImported(null);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -71,6 +73,7 @@ export default function MenuUploader() {
     if (res.ok) {
       setStatus("done");
       setMessage(`Imported ${chosen.length} menu${chosen.length === 1 ? "" : "s"}. Customers can see them now.`);
+      setImported({ dates: chosen.map((m) => m.date).sort(), version: Date.now() });
       setMenus([]);
       setSelected(new Set());
     } else {
@@ -116,6 +119,38 @@ export default function MenuUploader() {
           {w}
         </p>
       ))}
+
+      {imported && (
+        <div className="rounded-lg border border-border bg-surface p-5">
+          <h2 className="font-display text-lg font-semibold">Posters are ready</h2>
+          <p className="mt-1 text-sm text-muted">
+            A poster is made from each imported menu: the left side stays the same, the date, day and menu change.
+          </p>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+            {imported.dates.map((d) => (
+              <li key={d} className="flex items-center justify-between gap-3 rounded-md bg-background px-3 py-2 text-sm">
+                <span className="font-medium">{weekday(d)}</span>
+                <span className="flex gap-3">
+                  <a
+                    href={`/api/poster/${d}?v=${imported.version}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    View
+                  </a>
+                  <a
+                    href={`/api/poster/${d}?v=${imported.version}&download=1`}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Download
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {menus.length > 0 && (
         <div>

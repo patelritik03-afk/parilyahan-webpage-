@@ -9,6 +9,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["exceljs", "sharp"],
+  // The menu poster reads its fonts and artwork from disk, so make sure they ship with the deployment.
+  outputFileTracingIncludes: {
+    "/api/poster/[date]": ["./src/assets/poster/**/*"],
+  },
   images: {
     remotePatterns: [
       {

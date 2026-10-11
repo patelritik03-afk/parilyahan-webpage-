@@ -2,6 +2,7 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import MenuDisplay from "@/components/MenuDisplay";
 import MenuDateHeader from "@/components/MenuDateHeader";
+import MenuPosterLink from "@/components/MenuPosterLink";
 import { todayISO } from "@/lib/date";
 import type { MenuItem } from "@/lib/types";
 
@@ -23,17 +24,20 @@ export default async function MenuPage({ searchParams }: PageProps<"/menu">) {
 
   const { data } = await supabaseAdmin
     .from("daily_menu")
-    .select("items")
+    .select("items, updated_at")
     .eq("date", date)
     .maybeSingle();
 
   const items = (data?.items ?? []) as MenuItem[];
+  // Changes whenever the menu is saved, so a re-saved menu always gets a fresh poster.
+  const posterVersion = data?.updated_at ? Date.parse(data.updated_at) : 0;
 
   return (
     <>
       <MenuDateHeader date={date} today={today} />
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
         <MenuDisplay items={items} />
+        {items.length > 0 && <MenuPosterLink date={date} version={posterVersion} />}
       </div>
     </>
   );
