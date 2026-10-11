@@ -5,7 +5,8 @@ import {
   CARD_H,
   CARD_INNER_H,
   CARD_PAD,
-  COLLAGE_H,
+  COLLAGE_H_WEEKDAY,
+  COLLAGE_H_WEEKEND,
   COLLAGE_W,
   COLUMN_GAP,
   COLUMN_W,
@@ -43,7 +44,7 @@ type FontKey = "medium" | "semibold" | "extrabold" | "extrabolditalic";
 export type Fit = (text: string, maxWidth: number, maxSize: number, font: FontKey) => number;
 
 export type PosterProps = {
-  date: { short: string; weekday: string };
+  date: { short: string; weekday: string; weekend: boolean };
   layout: MenuLayout;
   logo: string;
   collage: string;
@@ -236,7 +237,8 @@ function Footer({ fit }: { fit: Fit }) {
   );
 }
 
-function LeftColumn({ fit, collage }: { fit: Fit; collage: string }) {
+function LeftColumn({ fit, collage, weekend }: { fit: Fit; collage: string; weekend: boolean }) {
+  const collageH = weekend ? COLLAGE_H_WEEKEND : COLLAGE_H_WEEKDAY;
   const titleSize = fit("BUFFET", LEFT_W, 150, "extrabolditalic");
   const topSize = fit("ALL-WEEK", LEFT_W, 120, "extrabolditalic");
   const title: CSSProperties = { fontWeight: 800, fontStyle: "italic", color: RED, letterSpacing: -2 };
@@ -300,33 +302,35 @@ function LeftColumn({ fit, collage }: { fit: Fit; collage: string }) {
         </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: LEFT_W,
-          height: 76,
-          background: RED,
-          border: `4px solid ${YELLOW}`,
-          borderRadius: 8,
-          boxSizing: "border-box",
-        }}
-      >
+      {weekend && (
         <div
           style={{
-            fontSize: fit(TEXT.freeBucket, LEFT_W - 40, 34, "extrabolditalic"),
-            fontWeight: 800,
-            fontStyle: "italic",
-            color: YELLOW,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: LEFT_W,
+            height: 76,
+            background: RED,
+            border: `4px solid ${YELLOW}`,
+            borderRadius: 8,
+            boxSizing: "border-box",
           }}
         >
-          {TEXT.freeBucket}
+          <div
+            style={{
+              fontSize: fit(TEXT.freeBucket, LEFT_W - 40, 34, "extrabolditalic"),
+              fontWeight: 800,
+              fontStyle: "italic",
+              color: YELLOW,
+            }}
+          >
+            {TEXT.freeBucket}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div style={{ display: "flex", width: COLLAGE_W, height: COLLAGE_H, borderRadius: 18, overflow: "hidden" }}>
-        <img src={collage} alt="" width={COLLAGE_W} height={COLLAGE_H} />
+      <div style={{ display: "flex", width: COLLAGE_W, height: collageH, borderRadius: 18, overflow: "hidden" }}>
+        <img src={collage} alt="" width={COLLAGE_W} height={collageH} />
       </div>
     </div>
   );
@@ -427,7 +431,7 @@ export default function PosterTemplate({ date, layout, logo, collage, fit }: Pos
           boxSizing: "border-box",
         }}
       >
-        <LeftColumn fit={fit} collage={collage} />
+        <LeftColumn fit={fit} collage={collage} weekend={date.weekend} />
 
         <div style={{ display: "flex", flexDirection: "column", width: RIGHT_W, marginLeft: COL_GAP }}>
           <div style={{ display: "flex", justifyContent: "center", width: RIGHT_W, height: LOGO_H }}>

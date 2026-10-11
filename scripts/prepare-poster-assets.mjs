@@ -1,10 +1,11 @@
 ﻿// Prepares the fixed artwork used by the daily menu poster (run: node scripts/prepare-poster-assets.mjs).
-// Output goes to src/assets/poster and is committed, so this only needs re-running if the photos change.
+// Output goes to src/assets/poster and is committed, so this only needs re-running if the pictures change.
 import sharp from "sharp";
 import path from "node:path";
 
 const root = process.cwd();
 const out = path.join(root, "src/assets/poster");
+const src = (name) => path.join(out, "source", `${name}.jpg`);
 
 // The site logo has light lettering for the dark header; darken the neutral pixels for a white poster.
 const { data, info } = await sharp(path.join(root, "public/brand/logo.png"))
@@ -19,30 +20,46 @@ for (let i = 0; i < data.length; i += 4) {
 }
 await sharp(data, { raw: info }).resize({ width: 760 }).png({ compressionLevel: 9 }).toFile(path.join(out, "logo-dark.png"));
 
-// Food photo mosaic. COLLAGE_W/H must match src/lib/poster/constants.ts.
+// Mosaic of AI-generated Filipino food pictures (see source/). Two columns of 208px, matching the 200px
+// source pictures so nothing is stretched much. Widths/heights must match src/lib/poster/constants.ts.
+// The weekend poster has a "free bucket seafoods" banner, so its collage is shorter than the weekday one.
 const COLLAGE_W = 424;
-const COLLAGE_H = 840;
 const GAP = 8;
-const half = (COLLAGE_W - GAP) / 2;
-const photo = (name) => path.join(root, "public/gallery", name);
-const cells = [
-  { file: "busog-lusog.webp", x: 0, y: 0, w: COLLAGE_W, h: 240 },
-  { file: "kare-kare.webp", x: 0, y: 248, w: half, h: 230 },
-  { file: "grilled-chicken-feet.webp", x: half + GAP, y: 248, w: half, h: 230 },
-  { file: "adobong-alimango.webp", x: 0, y: 486, w: half, h: 170 },
-  { file: "chicken-inasal.webp", x: half + GAP, y: 486, w: half, h: 170 },
-  { file: "lumpiang-shanghai.webp", x: 0, y: 664, w: COLLAGE_W, h: COLLAGE_H - 664 },
-];
+const CELL_W = (COLLAGE_W - GAP) / 2;
+const WIDE_H = 130;
 
-const layers = await Promise.all(
-  cells.map(async (c) => ({
-    input: await sharp(photo(c.file)).resize(c.w, c.h, { fit: "cover", position: "attention" }).toBuffer(),
-    left: c.x,
-    top: c.y,
-  }))
-);
-await sharp({ create: { width: COLLAGE_W, height: COLLAGE_H, channels: 3, background: "#ffffff" } })
-  .composite(layers)
-  .jpeg({ quality: 82, mozjpeg: true })
-  .toFile(path.join(out, "collage.jpg"));
+async function buildCollage(file, totalH, rows) {
+  const squareRows = rows.length;
+  const squareH = (totalH - WIDE_H - squareRows * GAP) / squareRows;
+  const heights = [WIDE_H, ...rows.map((_, i) => Math.floor(squareH) + (i < Math.round((squareH % 1) * squareRows) ? 1 : 0))];
+  const layers = [];
+  let y = 0;
+  const grid = [["feast-wide", "seafood-wide"], ...rows];
+  for (let r = 0; r < grid.length; r++) {
+    for (let c = 0; c < 2; c++) {
+      const input = await sharp(src(grid[r][c]))
+        .resize(CELL_W, heights[r], { fit: "cover", position: "centre", kernel: "lanczos3" })
+        .sharpen({ sigma: 0.6 })
+        .toBuffer();
+      layers.push({ input, left: c * (CELL_W + GAP), top: y });
+    }
+    y += heights[r] + GAP;
+  }
+  await sharp({ create: { width: COLLAGE_W, height: totalH, channels: 3, background: "#ffffff" } })
+    .composite(layers)
+    .jpeg({ quality: 88, mozjpeg: true })
+    .toFile(path.join(out, file));
+}
+
+await buildCollage("collage-weekend.jpg", 840, [
+  ["kare-kare", "inasal-bbq"],
+  ["lechon", "sisig"],
+  ["pancit-lumpia", "halo-halo"],
+]);
+await buildCollage("collage-weekday.jpg", 956, [
+  ["kare-kare", "inasal-bbq"],
+  ["lechon", "sisig"],
+  ["chicken-adobo", "sinigang"],
+  ["pancit-lumpia", "halo-halo"],
+]);
 console.log("poster assets written to", out);

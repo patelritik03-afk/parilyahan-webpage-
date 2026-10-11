@@ -1,4 +1,4 @@
-// Fixed geometry of the daily menu poster (1080x1920, a standard portrait screen / story size).
+﻿// Fixed geometry of the daily menu poster (1080x1920, a standard portrait screen / story size).
 export const POSTER_W = 1080;
 export const POSTER_H = 1920;
 
@@ -12,8 +12,10 @@ export const RIGHT_W = POSTER_W - 2 * PAD - LEFT_W - COL_GAP;
 export const CONTENT_H = POSTER_H - FOOTER_H - PAD - BODY_BOTTOM_GAP;
 
 // Must match scripts/prepare-poster-assets.mjs
+// The weekend poster has the free-seafood banner, so its picture collage is shorter than the weekday one.
 export const COLLAGE_W = 424;
-export const COLLAGE_H = 840;
+export const COLLAGE_H_WEEKEND = 840;
+export const COLLAGE_H_WEEKDAY = 956;
 
 export const LOGO_W = 430;
 export const LOGO_H = Math.round((LOGO_W * 377) / 900);

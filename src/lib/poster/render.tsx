@@ -1,4 +1,4 @@
-import "server-only";
+﻿import "server-only";
 import { ImageResponse } from "next/og";
 import type { MenuItem } from "@/lib/types";
 import { itemsToGroups } from "@/lib/menuSections";
@@ -28,13 +28,14 @@ export async function renderPosterPng(date: string, items: MenuItem[]): Promise<
     return width <= maxWidth ? maxSize : Math.floor((maxSize * maxWidth) / width);
   };
 
+  const label = posterDateLabel(date);
   const image = new ImageResponse(
     (
       <PosterTemplate
-        date={posterDateLabel(date)}
+        date={label}
         layout={layout}
         logo={assets.logo}
-        collage={assets.collage}
+        collage={label.weekend ? assets.collageWeekend : assets.collageWeekday}
         fit={fit}
       />
     ),
