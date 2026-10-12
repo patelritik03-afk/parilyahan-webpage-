@@ -20,13 +20,16 @@ const display = Poppins({
 
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "Parilyahan Sa Kalye";
 
-const title = `${siteName} | Filipino Daily Buffet in Dubai`;
-const description = "Filipino street-style daily buffet in Dubai. See today's menu and reserve your table online.";
+// The title starts with what people search for ("Filipino buffet Dubai"); other pages add " | name" after theirs.
+const title = `Filipino Buffet in Dubai from AED 39 | ${siteName}`;
+const description =
+  "Unlimited Filipino buffet in Dubai from AED 39 (excl. taxes). Fresh daily menu at Ibis Styles Hotel, Jumeirah 1. Reserve your table online.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title,
+  title: { default: title, template: `%s | ${siteName}` },
   description,
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName,

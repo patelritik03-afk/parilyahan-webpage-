@@ -4,7 +4,10 @@ import GalleryHeader from "@/components/GalleryHeader";
 import type { GalleryImage } from "@/lib/types";
 
 export const metadata = {
-  title: "Gallery | Parilyahan Sa Kalye",
+  title: "Gallery",
+  description:
+    "Photos of our Filipino buffet dishes, from grilled favorites and kare-kare to lumpia and desserts, at Parilyahan Sa Kalye in Dubai.",
+  alternates: { canonical: "/gallery" },
 };
 
 export const revalidate = 0;

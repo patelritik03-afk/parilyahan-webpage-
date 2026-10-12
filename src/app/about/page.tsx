@@ -2,7 +2,10 @@ import AboutContent from "@/components/AboutContent";
 import { getAboutOverride } from "@/lib/aboutStore";
 
 export const metadata = {
-  title: "About Us | Parilyahan Sa Kalye",
+  title: "About Us",
+  description:
+    "The story of Parilyahan Sa Kalye: home-cooked Filipino street food as an unlimited buffet at Ibis Styles Hotel, Jumeirah 1, Dubai.",
+  alternates: { canonical: "/about" },
 };
 
 export const revalidate = 300;

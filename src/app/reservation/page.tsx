@@ -2,7 +2,10 @@ import ReservationForm from "@/components/ReservationForm";
 import ReservationHeader from "@/components/ReservationHeader";
 
 export const metadata = {
-  title: "Reserve a Table | Parilyahan Sa Kalye",
+  title: "Reserve a Table",
+  description:
+    "Book your table at Parilyahan Sa Kalye, the unlimited Filipino buffet in Jumeirah 1, Dubai. Open daily 1 PM to 10 PM.",
+  alternates: { canonical: "/reservation" },
 };
 
 export default function ReservationPage() {

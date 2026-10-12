@@ -1,4 +1,4 @@
-﻿import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase";
 import MenuDisplay from "@/components/MenuDisplay";
 import MenuDateHeader from "@/components/MenuDateHeader";
@@ -7,7 +7,10 @@ import { todayISO } from "@/lib/date";
 import type { MenuItem } from "@/lib/types";
 
 export const metadata = {
-  title: "Menu | Parilyahan Sa Kalye",
+  title: "Daily Filipino Buffet Menu",
+  description:
+    "Today's Filipino buffet menu in Dubai: starters, soup, salad, noodles, main course, rice, special dishes, dessert and drinks. A fresh menu every day.",
+  alternates: { canonical: "/menu" },
 };
 
 export const revalidate = 0;

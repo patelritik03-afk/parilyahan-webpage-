@@ -2,7 +2,10 @@ import VideosContent from "@/components/VideosContent";
 import { getVideos } from "@/lib/videos";
 
 export const metadata = {
-  title: "Videos | Parilyahan Sa Kalye",
+  title: "Videos",
+  description:
+    "Watch the latest videos from Parilyahan Sa Kalye: fresh dishes, buffet spreads and Filipino street food in Dubai.",
+  alternates: { canonical: "/videos" },
 };
 
 export const revalidate = 300;

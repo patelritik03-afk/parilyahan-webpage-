@@ -2,7 +2,10 @@ import EnquiryForm from "@/components/EnquiryForm";
 import EnquiryHeader from "@/components/EnquiryHeader";
 
 export const metadata = {
-  title: "Enquiries | Parilyahan Sa Kalye",
+  title: "Enquiries",
+  description:
+    "Plan an event, collaboration or partnership with Parilyahan Sa Kalye, the Filipino buffet restaurant in Dubai.",
+  alternates: { canonical: "/enquiries" },
 };
 
 export default function EnquiriesPage() {
