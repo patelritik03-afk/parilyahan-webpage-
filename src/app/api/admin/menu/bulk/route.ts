@@ -23,7 +23,7 @@ const bulkSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("menu");
   if (denied) return denied;
 
   const body = await request.json().catch(() => null);

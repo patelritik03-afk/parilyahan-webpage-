@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { findReservations } from "@/lib/reservationsQuery";
 
 export async function GET(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("reservations");
   if (denied) return denied;
 
   const reservations = await findReservations(request.nextUrl.searchParams);

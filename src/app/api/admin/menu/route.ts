@@ -17,7 +17,7 @@ const putSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("menu");
   if (denied) return denied;
 
   const dateParam = request.nextUrl.searchParams.get("date");
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("menu");
   if (denied) return denied;
 
   const body = await request.json().catch(() => null);

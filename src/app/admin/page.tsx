@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,14 +18,17 @@ export default function AdminLoginPage() {
     const res = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ username, password }),
     });
 
     if (res.ok) {
       router.push("/admin/dashboard/menu");
       router.refresh();
+    } else if (res.status === 429) {
+      setError("Too many attempts. Please wait a few minutes and try again.");
+      setLoading(false);
     } else {
-      setError("Incorrect password.");
+      setError("Incorrect username or password.");
       setLoading(false);
     }
   }
@@ -34,12 +38,28 @@ export default function AdminLoginPage() {
       <h1 className="font-display text-2xl font-bold">Admin Login</h1>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
+          <label className="block text-sm font-medium text-foreground/80" htmlFor="username">
+            Username <span className="font-normal text-muted">(leave empty for the owner)</span>
+          </label>
+          <input
+            id="username"
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 focus:border-primary focus:outline-none"
+          />
+        </div>
+        <div>
           <label className="block text-sm font-medium text-foreground/80" htmlFor="password">
             Password
           </label>
           <input
             id="password"
             type="password"
+            autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}

@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import type { Area } from "@/lib/adminAreas";
 
-const tabs = [
-  { href: "/admin/dashboard/menu", label: "Menu" },
-  { href: "/admin/dashboard/name-tags", label: "Name Tags" },
+// `area` ties a tab to a staff permission; tabs without one are for the owner only.
+const tabs: { href: string; label: string; area?: Area }[] = [
+  { href: "/admin/dashboard/menu", label: "Menu", area: "menu" },
+  { href: "/admin/dashboard/name-tags", label: "Name Tags", area: "name-tags" },
   { href: "/admin/dashboard/offers", label: "Offers" },
-  { href: "/admin/dashboard/reservations", label: "Reservations" },
+  { href: "/admin/dashboard/reservations", label: "Reservations", area: "reservations" },
   { href: "/admin/dashboard/enquiries", label: "Enquiries" },
   { href: "/admin/dashboard/gallery", label: "Gallery" },
   { href: "/admin/dashboard/reviews", label: "Reviews" },
@@ -16,9 +18,18 @@ const tabs = [
   { href: "/admin/dashboard/settings", label: "Settings" },
 ];
 
-export default function DashboardNav() {
+export default function DashboardNav({
+  ownerAccess,
+  areas,
+  signedInAs,
+}: {
+  ownerAccess: boolean;
+  areas: Area[];
+  signedInAs?: string;
+}) {
   const pathname = usePathname();
   const router = useRouter();
+  const visibleTabs = tabs.filter((tab) => ownerAccess || (tab.area !== undefined && areas.includes(tab.area)));
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -29,7 +40,7 @@ export default function DashboardNav() {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
       <nav className="flex flex-wrap gap-2">
-        {tabs.map((tab) => (
+        {visibleTabs.map((tab) => (
           <Link
             key={tab.href}
             href={tab.href}
@@ -43,13 +54,16 @@ export default function DashboardNav() {
           </Link>
         ))}
       </nav>
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="text-sm font-medium text-muted hover:text-primary"
-      >
-        Log out
-      </button>
+      <div className="flex items-center gap-4">
+        {signedInAs && <span className="text-sm text-muted">Signed in as {signedInAs}</span>}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="text-sm font-medium text-muted hover:text-primary"
+        >
+          Log out
+        </button>
+      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { statusLabel } from "@/lib/reservationStatus";
 import { formatTimeLabel } from "@/lib/timeSlots";
 
 export async function GET(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("reservations");
   if (denied) return denied;
 
   const reservations = await findReservations(request.nextUrl.searchParams);

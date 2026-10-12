@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import { areaForPath, firstAreaPage, toAreas } from "@/lib/adminAreas";
 
 const COOKIE_NAME = "psk_admin_session";
 const MIN_SECRET_LENGTH = 32;
 
-async function hasValidSession(token: string | undefined) {
+async function readSession(token: string | undefined) {
   const secret = process.env.ADMIN_SESSION_SECRET;
-  if (!token || !secret || secret.length < MIN_SECRET_LENGTH) return false;
+  if (!token || !secret || secret.length < MIN_SECRET_LENGTH) return null;
   try {
-    await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
-    return true;
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret), { algorithms: ["HS256"] });
+    return payload;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -21,11 +22,26 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (await hasValidSession(request.cookies.get(COOKIE_NAME)?.value)) {
+  const session = await readSession(request.cookies.get(COOKIE_NAME)?.value);
+  const isApi = pathname.startsWith("/api/");
+
+  if (session?.role === "admin") {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/api/")) {
+  if (session?.role === "staff") {
+    const areas = toAreas(session.areas);
+    const needed = areaForPath(pathname);
+    if (needed === "any" || (needed !== "owner" && areas.includes(needed))) {
+      return NextResponse.next();
+    }
+    if (isApi) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.redirect(new URL(firstAreaPage(areas), request.url));
+  }
+
+  if (isApi) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   return NextResponse.redirect(new URL("/admin", request.url));

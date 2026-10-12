@@ -6,7 +6,7 @@ import { requireAdmin } from "@/lib/auth";
 const MAX_BYTES = 4 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("menu");
   if (denied) return denied;
 
   const formData = await request.formData().catch(() => null);

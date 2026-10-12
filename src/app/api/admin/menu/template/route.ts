@@ -1,4 +1,4 @@
-﻿import { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import ExcelJS from "exceljs";
 import { requireAdmin } from "@/lib/auth";
 
@@ -66,7 +66,7 @@ async function buildXlsx() {
 }
 
 export async function GET(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("menu");
   if (denied) return denied;
 
   const format = request.nextUrl.searchParams.get("format");

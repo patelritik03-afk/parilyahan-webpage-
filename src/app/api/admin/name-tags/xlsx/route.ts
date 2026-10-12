@@ -12,7 +12,7 @@ const bodySchema = z.object({
 
 // Builds the printable Excel file for the tags the owner ticked.
 export async function POST(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("name-tags");
   if (denied) return denied;
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));

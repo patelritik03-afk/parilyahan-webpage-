@@ -2,11 +2,16 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { AREAS, toAreas, type Area } from "./adminAreas";
+import { findActiveStaff } from "./staffUsers";
 
 const COOKIE_NAME = "psk_admin_session";
-const SESSION_DURATION = "7d";
+const OWNER_SESSION_SECONDS = 60 * 60 * 24 * 7;
+const STAFF_SESSION_SECONDS = 60 * 60 * 24;
 const ALG = "HS256";
 export const MIN_SECRET_LENGTH = 32;
+
+export type AdminSession = { role: "owner" | "staff"; username: string; name: string; areas: readonly Area[] };
 
 function getSecretKey() {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -16,11 +21,11 @@ function getSecretKey() {
   return new TextEncoder().encode(secret);
 }
 
-export async function createAdminSession() {
-  const token = await new SignJWT({ role: "admin" })
+async function setSessionCookie(payload: Record<string, unknown>, seconds: number) {
+  const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: ALG })
     .setIssuedAt()
-    .setExpirationTime(SESSION_DURATION)
+    .setExpirationTime(`${seconds}s`)
     .sign(getSecretKey());
 
   const cookieStore = await cookies();
@@ -29,8 +34,16 @@ export async function createAdminSession() {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: seconds,
   });
+}
+
+export async function createAdminSession() {
+  await setSessionCookie({ role: "admin" }, OWNER_SESSION_SECONDS);
+}
+
+export async function createStaffSession(user: { username: string; areas: Area[] }) {
+  await setSessionCookie({ role: "staff", sub: user.username, areas: user.areas }, STAFF_SESSION_SECONDS);
 }
 
 export async function clearAdminSession() {
@@ -38,26 +51,43 @@ export async function clearAdminSession() {
   cookieStore.delete(COOKIE_NAME);
 }
 
-export async function verifyAdminSessionToken(token: string | undefined) {
-  if (!token) return false;
+// Returns who is signed in. A staff session is checked against the database every time, so
+// switching an account off or changing its areas takes effect straight away.
+export async function getAdminSession(): Promise<AdminSession | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  if (!token) return null;
+
+  let payload;
   try {
-    await jwtVerify(token, getSecretKey(), { algorithms: [ALG] });
-    return true;
+    ({ payload } = await jwtVerify(token, getSecretKey(), { algorithms: [ALG] }));
   } catch {
-    return false;
+    return null;
   }
+
+  if (payload.role === "admin") {
+    return { role: "owner", username: "owner", name: "Owner", areas: AREAS };
+  }
+  if (payload.role === "staff" && typeof payload.sub === "string") {
+    const user = await findActiveStaff(payload.sub);
+    if (!user) return null;
+    return { role: "staff", username: user.username, name: user.displayName, areas: toAreas(user.areas) };
+  }
+  return null;
 }
 
 export async function isAdminAuthenticated() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  return verifyAdminSessionToken(token);
+  return (await getAdminSession()) !== null;
 }
 
 // Every /api/admin handler calls this first so the proxy is not the only gate.
-export async function requireAdmin() {
-  if (await isAdminAuthenticated()) return null;
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// With no area the route is owner-only; pass an area to let staff with that area in too.
+export async function requireAdmin(area?: Area) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (session.role === "owner") return null;
+  if (area && session.areas.includes(area)) return null;
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
 
 export const ADMIN_COOKIE_NAME = COOKIE_NAME;

@@ -8,7 +8,7 @@ import type { MenuItem } from "@/lib/types";
 
 // The dishes of one day's menu, ready to become name tags.
 export async function GET(request: NextRequest) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("name-tags");
   if (denied) return denied;
 
   const dateParam = request.nextUrl.searchParams.get("date");

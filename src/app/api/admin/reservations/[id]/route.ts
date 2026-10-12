@@ -19,7 +19,7 @@ const patchSchema = z.object({
 });
 
 export async function PATCH(request: NextRequest, ctx: RouteContext<"/api/admin/reservations/[id]">) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("reservations");
   if (denied) return denied;
 
   const { id } = await ctx.params;
@@ -47,7 +47,7 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<"/api/admin/
 }
 
 export async function DELETE(_request: NextRequest, ctx: RouteContext<"/api/admin/reservations/[id]">) {
-  const denied = await requireAdmin();
+  const denied = await requireAdmin("reservations");
   if (denied) return denied;
 
   const { id } = await ctx.params;
