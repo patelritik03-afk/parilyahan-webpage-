@@ -7,7 +7,7 @@ import { STATIC_GALLERY } from "@/lib/galleryData";
 import type { ReviewData } from "@/lib/reviews";
 import ReviewsSection from "./ReviewsSection";
 import OffersSection from "./OffersSection";
-import VideoGrid from "./VideoGrid";
+import VideoGrid, { type VideoCard } from "./VideoGrid";
 import type { Offer } from "@/lib/offers";
 
 const FEATURED = ["Busog Lusog", "Kare Kare", "Grilled Chicken Feet", "Adobong Alimango", "Lumpiang Shanghai", "Chicken Inasal"];
@@ -24,11 +24,11 @@ const icons = [
 
 export default function HomeContent({
   reviews,
-  videoIds = [],
+  videos = [],
   offers = [],
 }: {
   reviews: ReviewData;
-  videoIds?: string[];
+  videos?: VideoCard[];
   offers?: Offer[];
 }) {
   const { t } = useLanguage();
@@ -52,6 +52,7 @@ export default function HomeContent({
             width={900}
             height={377}
             priority
+            sizes="(max-width: 640px) 288px, 416px"
             className="w-72 drop-shadow-2xl sm:w-[26rem]"
           />
           <p className="mt-6 font-display text-sm font-semibold uppercase tracking-[0.25em] text-accent">
@@ -132,7 +133,7 @@ export default function HomeContent({
         </div>
       </section>
 
-      {videoIds.length > 0 && (
+      {videos.length > 0 && (
         <section className="bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
             <div className="flex flex-wrap items-end justify-between gap-4">
@@ -147,7 +148,7 @@ export default function HomeContent({
               </Link>
             </div>
             <div className="mt-8">
-              <VideoGrid videoIds={videoIds} />
+              <VideoGrid videos={videos} />
             </div>
           </div>
         </section>

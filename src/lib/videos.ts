@@ -7,6 +7,7 @@ export type VideoRow = {
   url: string;
   title: string | null;
   author: string | null;
+  thumb_url: string | null;
   created_at: string;
 };
 
@@ -14,7 +15,7 @@ export type VideoRow = {
 export async function getVideos(limit = 100): Promise<VideoRow[]> {
   const { data, error } = await supabaseAdmin
     .from("videos")
-    .select("id, video_id, url, title, author, created_at")
+    .select("id, video_id, url, title, author, thumb_url, created_at")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) return [];

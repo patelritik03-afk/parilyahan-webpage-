@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -32,6 +32,7 @@ export default function Navbar() {
             width={900}
             height={377}
             priority
+            sizes="120px"
             className="h-11 w-auto sm:h-12"
           />
         </Link>

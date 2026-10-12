@@ -29,6 +29,7 @@ export default function Footer() {
             alt="Parilyahan sa Kalye"
             width={900}
             height={377}
+            sizes="200px"
             className="h-20 w-auto"
           />
           <p className="mt-3 text-sm text-header-foreground/70">{t("footer.tagline")}</p>

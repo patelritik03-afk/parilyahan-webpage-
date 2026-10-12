@@ -1,4 +1,4 @@
-﻿-- Run this once in your Supabase project's SQL Editor (Database > SQL Editor > New query).
+-- Run this once in your Supabase project's SQL Editor (Database > SQL Editor > New query).
 -- All access from the app goes through the service role key on the server, so RLS is enabled
 -- with no public policies: the anon/public key gets no access to these tables at all.
 
@@ -77,6 +77,7 @@ create table if not exists videos (
   url text not null,
   title text,
   author text,
+  thumb_url text,
   created_at timestamptz not null default now()
 );
 

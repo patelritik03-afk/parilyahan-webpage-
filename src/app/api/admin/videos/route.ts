@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/auth";
 import { getVideos } from "@/lib/videos";
 import { resolveTikTokVideo } from "@/lib/tiktok";
+import { removeVideoThumbnail, saveVideoThumbnail } from "@/lib/videoThumb";
 
 const addSchema = z.object({ url: z.string().trim().min(1).max(500) });
 const deleteSchema = z.object({ id: z.uuid() });
@@ -37,11 +38,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // A small preview picture, so the site can show it instead of loading TikTok's heavy player.
+  const thumbUrl = video.thumbnailUrl ? await saveVideoThumbnail(video.videoId, video.thumbnailUrl) : null;
+
   const { error } = await supabaseAdmin.from("videos").insert({
     video_id: video.videoId,
     url: video.url,
     title: video.title,
     author: video.author,
+    thumb_url: thumbUrl,
   });
   if (error) {
     if (error.code === "23505") {
@@ -65,8 +70,15 @@ export async function DELETE(request: NextRequest) {
   const parsed = deleteSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid video." }, { status: 400 });
 
+  const { data: existing } = await supabaseAdmin
+    .from("videos")
+    .select("video_id")
+    .eq("id", parsed.data.id)
+    .maybeSingle();
+
   const { error } = await supabaseAdmin.from("videos").delete().eq("id", parsed.data.id);
   if (error) return NextResponse.json({ error: "Could not remove the video." }, { status: 500 });
+  if (existing?.video_id) await removeVideoThumbnail(existing.video_id).catch(() => {});
 
   refreshPages();
   return NextResponse.json({ ok: true });

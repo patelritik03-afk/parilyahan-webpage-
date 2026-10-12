@@ -12,5 +12,5 @@ export const revalidate = 300;
 
 export default async function VideosPage() {
   const videos = await getVideos();
-  return <VideosContent videoIds={videos.map((v) => v.video_id)} />;
+  return <VideosContent videos={videos.map((v) => ({ videoId: v.video_id, title: v.title, thumbUrl: v.thumb_url }))} />;
 }

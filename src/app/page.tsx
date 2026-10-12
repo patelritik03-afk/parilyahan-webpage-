@@ -1,4 +1,4 @@
-﻿import HomeContent from "@/components/HomeContent";
+import HomeContent from "@/components/HomeContent";
 import StructuredData from "@/components/StructuredData";
 import { getReviewData } from "@/lib/reviews";
 import { getVideos } from "@/lib/videos";
@@ -11,7 +11,7 @@ export default async function Home() {
   return (
     <>
       <StructuredData />
-      <HomeContent reviews={reviews} videoIds={videos.map((v) => v.video_id)} offers={offers} />
+      <HomeContent reviews={reviews} videos={videos.map((v) => ({ videoId: v.video_id, title: v.title, thumbUrl: v.thumb_url }))} offers={offers} />
     </>
   );
 }

@@ -3,9 +3,9 @@
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { TIKTOK_URL } from "@/lib/site";
 import PageBanner from "./PageBanner";
-import VideoGrid from "./VideoGrid";
+import VideoGrid, { type VideoCard } from "./VideoGrid";
 
-export default function VideosContent({ videoIds }: { videoIds: string[] }) {
+export default function VideosContent({ videos }: { videos: VideoCard[] }) {
   const { t } = useLanguage();
 
   return (
@@ -17,10 +17,10 @@ export default function VideosContent({ videoIds }: { videoIds: string[] }) {
       </PageBanner>
 
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        {videoIds.length === 0 ? (
+        {videos.length === 0 ? (
           <p className="text-center text-muted">{t("videos.empty")}</p>
         ) : (
-          <VideoGrid videoIds={videoIds} />
+          <VideoGrid videos={videos} />
         )}
         <div className="mt-12 text-center">
           <a

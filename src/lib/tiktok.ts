@@ -4,7 +4,13 @@ const TIKTOK_HOST = /(^|\.)tiktok\.com$/i;
 const SHORT_HOSTS = /^(vm|vt)\.tiktok\.com$/i;
 const VIDEO_ID = /\/video\/(\d{8,25})/;
 
-export type TikTokVideo = { videoId: string; url: string; title: string | null; author: string | null };
+export type TikTokVideo = {
+  videoId: string;
+  url: string;
+  title: string | null;
+  author: string | null;
+  thumbnailUrl: string | null;
+};
 
 function parseTikTokUrl(input: string): URL | null {
   try {
@@ -29,16 +35,23 @@ async function resolveShortLink(url: URL): Promise<URL | null> {
   }
 }
 
-async function fetchOEmbed(url: string): Promise<{ title: string | null; author: string | null }> {
+async function fetchOEmbed(
+  url: string
+): Promise<{ title: string | null; author: string | null; thumbnailUrl: string | null }> {
+  const none = { title: null, author: null, thumbnailUrl: null };
   try {
     const res = await fetch(`https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`, {
       signal: AbortSignal.timeout(6000),
     });
-    if (!res.ok) return { title: null, author: null };
-    const data = (await res.json()) as { title?: string; author_name?: string };
-    return { title: data.title?.slice(0, 300) || null, author: data.author_name?.slice(0, 100) || null };
+    if (!res.ok) return none;
+    const data = (await res.json()) as { title?: string; author_name?: string; thumbnail_url?: string };
+    return {
+      title: data.title?.slice(0, 300) || null,
+      author: data.author_name?.slice(0, 100) || null,
+      thumbnailUrl: data.thumbnail_url || null,
+    };
   } catch {
-    return { title: null, author: null };
+    return none;
   }
 }
 

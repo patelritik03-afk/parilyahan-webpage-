@@ -109,18 +109,23 @@ export default function ReviewsSection({ data }: { data: ReviewData }) {
                 >
                   ‹
                 </button>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center">
                   {reviews.map((review, i) => (
+                    // The button is a comfortable 24px tap area; the visible dot inside stays small.
                     <button
                       key={review.id}
                       type="button"
                       aria-label={`${t("reviews.goTo")} ${i + 1}`}
                       aria-current={i === index}
                       onClick={() => setIndex(i)}
-                      className={`h-2.5 rounded-full transition-all ${
-                        i === index ? "w-6 bg-primary" : "w-2.5 bg-border hover:bg-muted"
-                      }`}
-                    />
+                      className="group flex h-6 min-w-6 items-center justify-center px-0.5"
+                    >
+                      <span
+                        className={`block h-2.5 rounded-full transition-all ${
+                          i === index ? "w-6 bg-primary" : "w-2.5 bg-border group-hover:bg-muted"
+                        }`}
+                      />
+                    </button>
                   ))}
                 </div>
                 <button
