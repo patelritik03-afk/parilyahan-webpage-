@@ -31,7 +31,7 @@ export default function Navbar() {
             alt="Parilyahan sa Kalye - Home cooked Filipino streetfoods"
             width={900}
             height={377}
-            loading="eager"
+            preload
             sizes="120px"
             className="h-11 w-auto sm:h-12"
           />

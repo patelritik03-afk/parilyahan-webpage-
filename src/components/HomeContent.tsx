@@ -42,7 +42,7 @@ export default function HomeContent({
   return (
     <div>
       <section className="relative isolate overflow-hidden bg-header text-white">
-        <Image src="/images/hero-atrium.webp" alt="" fill loading="eager" fetchPriority="high" sizes="100vw" className="-z-20 object-cover" />
+        <Image src="/images/hero-atrium.webp" alt="" fill preload sizes="100vw" className="-z-20 object-cover" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/75 via-black/50 to-black/85" />
         <div className="mx-auto flex min-h-[80vh] max-w-6xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6">
           <h1 className="sr-only">{t("home.title")}</h1>
@@ -51,8 +51,7 @@ export default function HomeContent({
             alt=""
             width={900}
             height={377}
-            loading="eager"
-            fetchPriority="high"
+            preload
             sizes="(max-width: 640px) 288px, 416px"
             className="w-72 drop-shadow-2xl sm:w-[26rem]"
           />
