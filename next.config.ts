@@ -25,6 +25,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
+  // Google Search Console checks this file under /menu/ for the "/menu/" property; the real file lives in public/.
+  async rewrites() {
+    return [
+      { source: "/menu/googleef5a936795fdf5bd.html", destination: "/googleef5a936795fdf5bd.html" },
+    ];
+  },
 };
 
 export default nextConfig;
