@@ -42,7 +42,7 @@ export default function HomeContent({
   return (
     <div>
       <section className="relative isolate overflow-hidden bg-header text-white">
-        <Image src="/images/hero-atrium.webp" alt="" fill preload sizes="100vw" className="-z-20 object-cover" />
+        <Image src="/images/hero-atrium.webp" alt="" fill preload quality={50} sizes="100vw" className="-z-20 object-cover" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/75 via-black/50 to-black/85" />
         <div className="mx-auto flex min-h-[80vh] max-w-6xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6">
           <h1 className="sr-only">{t("home.title")}</h1>
@@ -157,7 +157,7 @@ export default function HomeContent({
       <ReviewsSection data={reviews} />
 
       <section className="relative isolate overflow-hidden bg-header text-white">
-        <Image src="/images/hero-buffet.webp" alt="" fill sizes="100vw" className="-z-20 object-cover" />
+        <Image src="/images/hero-buffet.webp" alt="" fill quality={50} sizes="100vw" className="-z-20 object-cover" />
         <div className="absolute inset-0 -z-10 bg-black/65" />
         <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
           <h2 className="font-display text-3xl font-bold sm:text-4xl">{t("home.ctaTitle")}</h2>

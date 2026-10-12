@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
     "/api/poster/[date]": ["./src/assets/poster/**/*"],
   },
   images: {
+    // AVIF is much smaller than WebP for photos; browsers that cannot show it still get WebP.
+    formats: ["image/avif", "image/webp"],
+    // 50 is used for the dark hero/banner photos, which sit under a dark overlay.
+    qualities: [50, 75],
     remotePatterns: [
       {
         protocol: "https",
