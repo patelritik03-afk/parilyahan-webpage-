@@ -1,0 +1,82 @@
+/* Name tag sheet: A4 portrait, 2 tags across and 5 down, like the NAME TAG IBIS Excel sheet. */
+.psk-page {
+  width: 210mm;
+  height: 297mm;
+  box-sizing: border-box;
+  padding-top: 17mm;
+  display: grid;
+  grid-template-columns: repeat(2, 84mm);
+  grid-auto-rows: 46mm;
+  column-gap: 4mm;
+  row-gap: 8mm;
+  justify-content: center;
+  align-content: start;
+  background: #fff;
+  break-after: page;
+  page-break-after: always;
+}
+
+.psk-page:last-child {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+.psk-tag {
+  box-sizing: border-box;
+  border: 0.5mm solid #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+}
+
+.psk-logo {
+  width: 23mm;
+  height: auto;
+  margin-top: 1mm;
+  flex: none;
+}
+
+.psk-name {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4mm 2mm;
+  text-align: center;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+/* The copy that gets printed lives outside the page layout and is only shown while printing. */
+.psk-print-root {
+  display: none;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  body.psk-printing > *:not(.psk-print-root) {
+    display: none !important;
+  }
+
+  body.psk-printing .psk-print-root {
+    display: block;
+  }
+
+  body.psk-printing {
+    margin: 0;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

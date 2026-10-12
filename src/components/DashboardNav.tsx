@@ -1,10 +1,11 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const tabs = [
   { href: "/admin/dashboard/menu", label: "Menu" },
+  { href: "/admin/dashboard/name-tags", label: "Name Tags" },
   { href: "/admin/dashboard/offers", label: "Offers" },
   { href: "/admin/dashboard/reservations", label: "Reservations" },
   { href: "/admin/dashboard/enquiries", label: "Enquiries" },

@@ -223,6 +223,12 @@ export default function MenuEditor() {
             <div>
               <MenuPosterPanel key={`${date}-${posterVersion}`} date={date} version={posterVersion} />
               <p className="mt-2 text-xs text-muted">The poster shows the last saved menu. Save again to update it.</p>
+              <a
+                href={`/admin/dashboard/name-tags?date=${date}`}
+                className="mt-4 inline-block rounded-full border border-border bg-surface px-5 py-2 text-sm font-semibold hover:border-primary hover:text-primary"
+              >
+                Print name tags for this menu
+              </a>
             </div>
           )}
         </>

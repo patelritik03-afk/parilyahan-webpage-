@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   // The menu poster reads its fonts and artwork from disk, so make sure they ship with the deployment.
   outputFileTracingIncludes: {
     "/api/poster/[date]": ["./src/assets/poster/**/*"],
+    "/api/admin/name-tags/xlsx": ["./src/assets/nametag/**/*"],
+    "/api/admin/name-tags/logo": ["./src/assets/nametag/**/*"],
   },
   images: {
     // AVIF is much smaller than WebP for photos; browsers that cannot show it still get WebP.

@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Admin | Parilyahan Sa Kalye",
+  title: "Admin",
   robots: { index: false, follow: false },
 };
 
