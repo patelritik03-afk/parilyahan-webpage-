@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 const inputClass =
   "mt-1 w-full rounded-md border border-border bg-surface px-3 py-2 focus:border-primary focus:outline-none";
 
-export default function ChangePasswordForm() {
+export default function ChangePasswordForm({ endpoint = "/api/admin/password" }: { endpoint?: string }) {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -23,7 +23,7 @@ export default function ChangePasswordForm() {
     }
 
     setLoading(true);
-    const res = await fetch("/api/admin/password", {
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ current, next }),

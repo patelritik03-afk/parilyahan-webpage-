@@ -25,6 +25,21 @@ export async function findActiveStaff(username: string): Promise<StaffUser | nul
   };
 }
 
+export async function changeStaffPassword(username: string, current: string, next: string) {
+  const user = await findActiveStaff(username);
+  if (!user || !(await bcrypt.compare(current, user.passwordHash))) return "wrong-current" as const;
+
+  const { error } = await supabaseAdmin
+    .from("staff_users")
+    .update({ password_hash: await bcrypt.hash(next, 10), updated_at: new Date().toISOString() })
+    .eq("username", username);
+  if (error) {
+    console.error("Could not save the staff password", error);
+    return "failed" as const;
+  }
+  return "ok" as const;
+}
+
 export async function checkStaffLogin(username: string, password: string): Promise<StaffUser | null> {
   const user = await findActiveStaff(username);
   const valid = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);

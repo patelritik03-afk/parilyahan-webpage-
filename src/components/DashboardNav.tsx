@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { Area } from "@/lib/adminAreas";
 
 // `area` ties a tab to a staff permission; tabs without one are for the owner only.
-const tabs: { href: string; label: string; area?: Area }[] = [
+const tabs: { href: string; label: string; area?: Area; staffOnly?: boolean }[] = [
   { href: "/admin/dashboard/menu", label: "Menu", area: "menu" },
   { href: "/admin/dashboard/name-tags", label: "Name Tags", area: "name-tags" },
   { href: "/admin/dashboard/offers", label: "Offers" },
@@ -16,6 +16,7 @@ const tabs: { href: string; label: string; area?: Area }[] = [
   { href: "/admin/dashboard/videos", label: "Videos" },
   { href: "/admin/dashboard/about", label: "About Us" },
   { href: "/admin/dashboard/settings", label: "Settings" },
+  { href: "/admin/dashboard/account", label: "My Password", staffOnly: true },
 ];
 
 export default function DashboardNav({
@@ -29,7 +30,9 @@ export default function DashboardNav({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const visibleTabs = tabs.filter((tab) => ownerAccess || (tab.area !== undefined && areas.includes(tab.area)));
+  const visibleTabs = tabs.filter((tab) =>
+    ownerAccess ? !tab.staffOnly : tab.staffOnly || (tab.area !== undefined && areas.includes(tab.area))
+  );
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });

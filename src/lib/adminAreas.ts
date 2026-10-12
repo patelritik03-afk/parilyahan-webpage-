@@ -21,7 +21,14 @@ function startsWithSegment(pathname: string, base: string) {
 
 // "any"   = every signed-in user, "owner" = owner only (the default for anything not listed).
 export function areaForPath(pathname: string): Area | "any" | "owner" {
-  if (pathname === "/admin/dashboard" || pathname === "/api/admin/logout") return "any";
+  if (
+    pathname === "/admin/dashboard" ||
+    pathname === "/api/admin/logout" ||
+    startsWithSegment(pathname, "/admin/dashboard/account") ||
+    startsWithSegment(pathname, "/api/admin/account")
+  ) {
+    return "any";
+  }
   for (const area of AREAS) {
     if (startsWithSegment(pathname, `${PAGE_PREFIX}${area}`) || startsWithSegment(pathname, `${API_PREFIX}${area}`)) {
       return area;
