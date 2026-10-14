@@ -19,7 +19,7 @@ export default function StructuredData() {
     "@id": `${SITE_URL}/#restaurant`,
     name: "Parilyahan Sa Kalye",
     description:
-      "Home-cooked Filipino street food served as an unlimited daily buffet in Dubai, with a fresh menu every day.",
+      "Halal certified, home-cooked Filipino street food served as an unlimited daily buffet in Dubai, with a fresh menu every day.",
     url: SITE_URL,
     image: [`${SITE_URL}/images/hero-buffet.webp`, `${SITE_URL}/images/hero-atrium.webp`],
     logo: `${SITE_URL}/brand/logo.png`,

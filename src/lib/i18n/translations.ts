@@ -55,7 +55,7 @@ export const en = {
   "reviews.next": "Next review",
   "reviews.goTo": "Go to review",
 
-  "home.hours": "Open daily \u00b7 1 PM - 10 PM",
+  "home.hours": "Open daily \u00b7 1 PM - 10 PM \u00b7 Halal certified",
   "home.tasteEyebrow": "From our kitchen",
   "home.tasteTitle": "A taste of the buffet",
   "home.tasteLink": "See the full gallery",
@@ -188,7 +188,7 @@ export const tl: Record<TranslationKey, string> = {
   "reviews.next": "Susunod na review",
   "reviews.goTo": "Pumunta sa review",
 
-  "home.hours": "Bukas araw-araw \u00b7 1 PM - 10 PM",
+  "home.hours": "Bukas araw-araw \u00b7 1 PM - 10 PM \u00b7 Halal certified",
   "home.tasteEyebrow": "Mula sa aming kusina",
   "home.tasteTitle": "Tikman ang buffet",
   "home.tasteLink": "Tingnan ang buong gallery",

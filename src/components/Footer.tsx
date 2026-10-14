@@ -6,6 +6,7 @@ import SocialLinks from "./SocialLinks";
 import { ADDRESS_LINES, CONTACT_EMAIL, MAPS_URL, PHONE_DISPLAY, PHONE_TEL, WHATSAPP_NUMBER } from "@/lib/site";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import type { TranslationKey } from "@/lib/i18n/translations";
+import { SEO_PAGES } from "@/lib/seoPages";
 
 const links: { href: string; key: TranslationKey }[] = [
   { href: "/menu", key: "nav.menu" },
@@ -39,6 +40,11 @@ export default function Footer() {
           {links.map((link) => (
             <Link key={link.href} href={link.href} className="text-header-foreground/80 hover:text-accent">
               {t(link.key)}
+            </Link>
+          ))}
+          {SEO_PAGES.map((page) => (
+            <Link key={page.slug} href={`/${page.slug}`} className="text-header-foreground/80 hover:text-accent">
+              {page.h1}
             </Link>
           ))}
         </nav>

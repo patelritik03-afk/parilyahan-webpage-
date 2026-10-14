@@ -23,7 +23,7 @@ const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "Parilyahan Sa Kalye";
 // The title starts with what people search for ("Filipino buffet Dubai"); other pages add " | name" after theirs.
 const title = `Filipino Buffet in Dubai from AED 39 | ${siteName}`;
 const description =
-  "Unlimited Filipino buffet in Dubai from AED 39 (excl. taxes). Fresh daily menu at Ibis Styles Hotel, Jumeirah 1. Reserve your table online.";
+  "Halal certified unlimited Filipino buffet in Dubai from AED 39 + taxes. Fresh daily menu at Ibis Styles Hotel, Jumeirah 1. Reserve online.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
