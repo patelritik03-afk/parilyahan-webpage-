@@ -127,6 +127,11 @@ export const en = {
   "reservation.another": "Make another reservation",
   "reservation.genericError": "Something went wrong. Please try again.",
   "reservation.summaryTemplate": "{date} at {time}, party of {size}.",
+  "reservation.infoPrices": "Mon - Thu AED {weekday} · Fri - Sun AED {weekend} (+ taxes)",
+  "reservation.infoDetails": "Open daily 1 PM - 10 PM · Halal certified · Free parking",
+  "reservation.infoBucket": "Free seafood bucket every Fri - Sun",
+  "reservation.whatsapp": "Prefer WhatsApp? Chat with us",
+  "reservation.whatsappText": "Hi, I'd like to reserve a table at Parilyahan Sa Kalye.",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -260,6 +265,11 @@ export const tl: Record<TranslationKey, string> = {
   "reservation.another": "Gumawa ng isa pang reservation",
   "reservation.genericError": "May nagkamali. Pakisubukan ulit.",
   "reservation.summaryTemplate": "{date}, {time}, {size} katao.",
+  "reservation.infoPrices": "Mon - Thu AED {weekday} · Fri - Sun AED {weekend} (+ taxes)",
+  "reservation.infoDetails": "Bukas araw-araw 1 PM - 10 PM · Halal certified · Libreng paradahan",
+  "reservation.infoBucket": "Libreng bucket ng seafood tuwing Fri - Sun",
+  "reservation.whatsapp": "Mas gusto ang WhatsApp? Mag-chat sa amin",
+  "reservation.whatsappText": "Hi, gusto ko pong mag-reserve ng mesa sa Parilyahan Sa Kalye.",
 };
 
 export type Lang = "en" | "tl";

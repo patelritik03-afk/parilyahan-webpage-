@@ -7,7 +7,7 @@ export default function ReservationHeader() {
   const { t } = useLanguage();
 
   return (
-    <PageBanner image="/images/hero-atrium.webp">
+    <PageBanner image="/images/hero-atrium.webp" compact>
       <p className="font-display text-sm font-semibold uppercase tracking-widest text-accent">
         {t("reservation.eyebrow")}
       </p>

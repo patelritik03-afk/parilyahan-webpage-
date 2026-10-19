@@ -22,7 +22,7 @@ const reservationSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const limited = await enforceRateLimit("reservations", request, { limit: 5, windowSec: 10 * 60 });
+  const limited = await enforceRateLimit("reservations", request, { limit: 10, windowSec: 10 * 60 });
   if (limited) return limited;
 
   const body = await request.json().catch(() => null);

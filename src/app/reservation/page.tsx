@@ -1,5 +1,6 @@
 import ReservationForm from "@/components/ReservationForm";
 import ReservationHeader from "@/components/ReservationHeader";
+import ReservationInfo from "@/components/ReservationInfo";
 
 export const metadata = {
   title: "Reserve a Table",
@@ -12,7 +13,8 @@ export default function ReservationPage() {
   return (
     <>
       <ReservationHeader />
-      <div className="mx-auto max-w-xl px-4 py-12 sm:px-6">
+      <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-12">
+        <ReservationInfo />
         <ReservationForm />
       </div>
     </>
