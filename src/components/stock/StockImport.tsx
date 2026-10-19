@@ -6,6 +6,7 @@ type SheetPreview = {
   name: string;
   recommended: boolean;
   count: number;
+  withUnit: number;
   newCount: number;
   problems: string[];
   sample: { name: string; category: string; sub_category?: string; base_unit?: string; brand?: string }[];
@@ -88,7 +89,8 @@ export default function StockImport() {
         <h2 className="font-display text-lg font-semibold">2. Import an Excel file</h2>
         <p className="mt-1 text-sm text-foreground/80">
           Your Food Stock List or the file from step 1. Items are matched by name: existing items are updated, new names
-          are added. Nothing is saved until you press Import.
+          are added. A &quot;Unit&quot; (or &quot;UOM&quot;) column is read automatically, and spellings like ltr, ctn, pkt,
+          bdl or btl become L, carton, pack, bundle and bottle. Nothing is saved until you press Import.
         </p>
         <input
           type="file"
@@ -118,6 +120,13 @@ export default function StockImport() {
                     {sheet.count} items ({sheet.newCount} new, {sheet.count - sheet.newCount} to update)
                   </span>
                 </label>
+                <p className="mt-1 pl-7 text-xs text-muted">
+                  {sheet.withUnit === sheet.count
+                    ? "Units found for every item."
+                    : sheet.withUnit > 0
+                      ? `Units found for ${sheet.withUnit} of ${sheet.count} items; the rest keep their unit (new ones start in kg or pcs).`
+                      : "No unit column: existing items keep their unit, new ones start in kg or pcs."}
+                </p>
                 <ul className="mt-2 space-y-0.5 pl-7 text-xs text-muted">
                   {sheet.sample.map((row) => (
                     <li key={row.name}>

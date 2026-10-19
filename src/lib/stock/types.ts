@@ -1,8 +1,39 @@
 // Shared by the stock screens and API routes (no server-only imports).
 
 export const UNITS = [
-  "kg", "g", "L", "ml", "pcs", "pack", "box", "carton", "tray", "bottle", "can", "jar", "bag", "sack", "bundle", "dozen",
+  "kg", "g", "L", "ml", "gal", "pcs", "pack", "box", "carton", "tray", "bottle", "can", "jar", "bag", "sack", "bundle",
+  "roll", "set", "dozen",
 ] as const;
+
+// Spellings seen in registers and supplier bills, mapped to the units above.
+const UNIT_ALIASES: Record<string, string> = {
+  kg: "kg", kgs: "kg", kilo: "kg", kilos: "kg", kilogram: "kg", kilograms: "kg",
+  g: "g", gm: "g", gms: "g", gr: "g", grm: "g", gram: "g", grams: "g",
+  l: "L", lt: "L", ltr: "L", ltrs: "L", litre: "L", litres: "L", liter: "L", liters: "L",
+  ml: "ml", mls: "ml",
+  gal: "gal", gals: "gal", gallon: "gal", gallons: "gal",
+  pcs: "pcs", pc: "pcs", piece: "pcs", pieces: "pcs", nos: "pcs", no: "pcs", ea: "pcs", each: "pcs", unit: "pcs", units: "pcs",
+  pkt: "pack", pkts: "pack", pack: "pack", packs: "pack", packet: "pack", packets: "pack", pk: "pack",
+  ctn: "carton", ctns: "carton", carton: "carton", cartons: "carton", cs: "carton", case: "carton", cases: "carton",
+  box: "box", boxes: "box", bx: "box",
+  tray: "tray", trays: "tray",
+  btl: "bottle", btls: "bottle", bottle: "bottle", bottles: "bottle",
+  can: "can", cans: "can", tin: "can", tins: "can",
+  jar: "jar", jars: "jar",
+  bag: "bag", bags: "bag",
+  sack: "sack", sacks: "sack",
+  bdl: "bundle", bdls: "bundle", bundle: "bundle", bundles: "bundle",
+  roll: "roll", rolls: "roll", rl: "roll",
+  set: "set", sets: "set",
+  dozen: "dozen", dz: "dozen", doz: "dozen",
+};
+
+// "Ltr" -> "L", "CTN" -> "carton", "pkt" -> "pack". Unknown units are kept as written.
+export function normalizeUnit(value: string) {
+  const raw = value.trim();
+  const key = raw.toLowerCase().replace(/[.\s]/g, "");
+  return UNIT_ALIASES[key] ?? raw.slice(0, 20);
+}
 
 export const CATEGORY_ORDER = [
   "Meat",

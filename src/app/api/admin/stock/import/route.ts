@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
         name: s.name,
         recommended: s.recommended,
         count: s.rows.length,
+        withUnit: s.withUnit,
         newCount: s.rows.filter((r) => !existingNames.has(r.name.toLowerCase())).length,
         problems: s.problems,
         sample: s.rows.slice(0, 8),

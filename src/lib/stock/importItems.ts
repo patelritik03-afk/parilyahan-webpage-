@@ -1,5 +1,6 @@
 import "server-only";
 import ExcelJS from "exceljs";
+import { UNITS, normalizeUnit } from "./types";
 
 // Reads two kinds of workbook:
 //  1. The owner's "Food Stock List" (Item Name, Category, Sub-category, Brand / Variant, Size / Pack,
@@ -27,6 +28,8 @@ export type ImportRow = {
 export type ImportSheet = {
   name: string;
   rows: ImportRow[];
+  // How many rows have a unit in the file.
+  withUnit: number;
   // Selected by default: the main food list and this app's own export.
   recommended: boolean;
   problems: string[];
@@ -35,16 +38,13 @@ export type ImportSheet = {
 const MAX_ROWS = 3000;
 
 // Sheets in the owner's file that are not stock items.
-const SKIP_SHEETS = /not stock|mapping|brandlist|sizelist/i;
+const SKIP_SHEETS = /not stock|mapping|brandlist|sizelist|unitlist/i;
 
 // Sheets without a Category column get one from the sheet name.
 const SHEET_CATEGORY: [RegExp, string][] = [
   [/packing|cleaning/i, "Packing & Cleaning"],
   [/utensil|equipment/i, "Utensils & Equipment"],
 ];
-
-// Weight-based categories default to kg, everything else to pieces, until the owner sets the unit.
-const KG_CATEGORIES = new Set(["meat", "seafood", "vegetables & fruits"]);
 
 type Field = keyof ImportRow;
 const HEADERS: Record<string, Field> = {
@@ -65,6 +65,10 @@ const HEADERS: Record<string, Field> = {
   alsosearchas: "aliases",
   baseunit: "base_unit",
   unit: "base_unit",
+  units: "base_unit",
+  uom: "base_unit",
+  unitofmeasure: "base_unit",
+  unitofmeasurement: "base_unit",
   purchaseunit: "purchase_unit",
   baseunitsperpurchaseunit: "purchase_factor",
   purchasefactor: "purchase_factor",
@@ -127,7 +131,9 @@ function parseSheet(ws: ExcelJS.Worksheet): ImportSheet | null {
 
   const hasCategory = columns.some((c) => c.field === "category");
   const sheetCategory = SHEET_CATEGORY.find(([re]) => re.test(ws.name))?.[1] ?? "General";
-  const isOwnExport = columns.some((c) => c.field === "base_unit");
+  // This app's own export has par levels and conversion factors; the owner's list does not.
+  const isAppExport = columns.some((c) => c.field === "purchase_factor" || c.field === "par_level");
+  let withUnit = 0;
   const problems: string[] = [];
   const rows: ImportRow[] = [];
   const seen = new Set<string>();
@@ -152,8 +158,16 @@ function parseSheet(ws: ExcelJS.Worksheet): ImportSheet | null {
     if (values.brand) item.brand = values.brand.slice(0, 80);
     if (values.pack_size) item.pack_size = values.pack_size.slice(0, 60);
     if (values.aliases) item.aliases = aliasesFrom(values.aliases, name) || undefined;
-    if (values.base_unit) item.base_unit = values.base_unit.slice(0, 20);
-    if (values.purchase_unit) item.purchase_unit = values.purchase_unit.slice(0, 20);
+    for (const field of ["base_unit", "purchase_unit"] as const) {
+      const raw = values[field];
+      if (!raw) continue;
+      const unit = normalizeUnit(raw);
+      if (!(UNITS as readonly string[]).includes(unit)) {
+        problems.push(`Row ${r}: unit "${raw}" for ${name} is not a standard unit, it is kept as written.`);
+      }
+      item[field] = unit;
+    }
+    if (item.base_unit) withUnit++;
     if (values.supplier) item.supplier = values.supplier.slice(0, 120);
 
     for (const field of NUMBER_FIELDS) {
@@ -165,12 +179,18 @@ function parseSheet(ws: ExcelJS.Worksheet): ImportSheet | null {
       else (item[field] as number) = n;
     }
 
-    // New items from the owner's list get a sensible starting unit.
-    if (!isOwnExport && !item.base_unit) item.base_unit = KG_CATEGORIES.has(category.toLowerCase()) ? "kg" : "pcs";
+    // A missing unit is left empty here: the database gives new items kg or pcs by category,
+    // and an existing item keeps the unit it already has.
     rows.push(item);
   }
 
-  return { name: ws.name, rows, recommended: hasCategory || isOwnExport, problems: problems.slice(0, 50) };
+  return {
+    name: ws.name,
+    rows,
+    withUnit,
+    recommended: hasCategory || isAppExport,
+    problems: problems.slice(0, 50),
+  };
 }
 
 export async function parseStockWorkbook(data: Buffer): Promise<ImportSheet[]> {
