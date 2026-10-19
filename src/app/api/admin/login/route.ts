@@ -4,6 +4,7 @@ import { createAdminSession, createStaffSession } from "@/lib/auth";
 import { enforceRateLimit } from "@/lib/rateLimit";
 import { getPasswordHash } from "@/lib/adminPassword";
 import { checkStaffLogin } from "@/lib/staffUsers";
+import { firstAreaPage } from "@/lib/adminAreas";
 
 const OWNER_NAMES = new Set(["", "owner", "admin"]);
 
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
       console.error("Could not create staff session", err);
       return NextResponse.json({ error: "Not configured" }, { status: 500 });
     }
-    return NextResponse.json({ ok: true });
+    // Where this person starts: the stock dashboard for stock staff, otherwise their first area.
+    return NextResponse.json({ ok: true, home: firstAreaPage(user.areas) });
   }
 
   const hash = await getPasswordHash();

@@ -23,7 +23,8 @@ export default function AdminLoginPage() {
     });
 
     if (res.ok) {
-      const next = safeNextPath(new URLSearchParams(window.location.search).get("next"));
+      const data = await res.json().catch(() => ({}));
+      const next = safeNextPath(new URLSearchParams(window.location.search).get("next")) ?? safeNextPath(data.home);
       router.push(next ?? "/admin/dashboard/menu");
       router.refresh();
     } else if (res.status === 429) {

@@ -60,7 +60,9 @@ export function areaHomePage(area: Area) {
   return area === "stock" ? STOCK_APP_PATH : `${PAGE_PREFIX}${area}`;
 }
 
+// Staff who use the stock app start on its dashboard; others on their first admin area.
 export function firstAreaPage(areas: Area[]) {
+  if (areas.includes("stock")) return STOCK_APP_PATH;
   return areas.length > 0 ? areaHomePage(areas[0]) : "/admin";
 }
 

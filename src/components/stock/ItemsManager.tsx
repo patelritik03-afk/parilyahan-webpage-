@@ -93,13 +93,19 @@ function belowPar(item: StockItem) {
   return item.par_level !== null && item.qty < item.par_level;
 }
 
-export default function ItemsManager({ canManage }: { canManage: boolean }) {
+export default function ItemsManager({
+  canManage,
+  initialBelowPar = false,
+}: {
+  canManage: boolean;
+  initialBelowPar?: boolean;
+}) {
   const [items, setItems] = useState<StockItem[] | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [showInactive, setShowInactive] = useState(false);
-  const [onlyBelowPar, setOnlyBelowPar] = useState(false);
+  const [onlyBelowPar, setOnlyBelowPar] = useState(initialBelowPar);
   const [openId, setOpenId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
