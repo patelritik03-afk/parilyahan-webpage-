@@ -10,6 +10,7 @@ const tabs: { href: string; label: string; area?: Area; staffOnly?: boolean }[] 
   { href: "/admin/dashboard/name-tags", label: "Name Tags", area: "name-tags" },
   { href: "/admin/dashboard/offers", label: "Offers" },
   { href: "/admin/dashboard/reservations", label: "Reservations", area: "reservations" },
+  { href: "/stock", label: "Stock", area: "stock" },
   { href: "/admin/dashboard/enquiries", label: "Enquiries" },
   { href: "/admin/dashboard/gallery", label: "Gallery" },
   { href: "/admin/dashboard/reviews", label: "Reviews" },

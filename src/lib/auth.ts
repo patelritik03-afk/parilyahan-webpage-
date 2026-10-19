@@ -2,7 +2,7 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { AREAS, toAreas, type Area } from "./adminAreas";
+import { AREAS, toAreas, type Area, type StaffRole } from "./adminAreas";
 import { findActiveStaff } from "./staffUsers";
 
 const COOKIE_NAME = "psk_admin_session";
@@ -11,7 +11,14 @@ const STAFF_SESSION_SECONDS = 60 * 60 * 24;
 const ALG = "HS256";
 export const MIN_SECRET_LENGTH = 32;
 
-export type AdminSession = { role: "owner" | "staff"; username: string; name: string; areas: readonly Area[] };
+// `level` is what the stock app checks: the owner and heads approve and see costs, staff make entries.
+export type AdminSession = {
+  role: "owner" | "staff";
+  level: "owner" | StaffRole;
+  username: string;
+  name: string;
+  areas: readonly Area[];
+};
 
 function getSecretKey() {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -66,12 +73,18 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   }
 
   if (payload.role === "admin") {
-    return { role: "owner", username: "owner", name: "Owner", areas: AREAS };
+    return { role: "owner", level: "owner", username: "owner", name: "Owner", areas: AREAS };
   }
   if (payload.role === "staff" && typeof payload.sub === "string") {
     const user = await findActiveStaff(payload.sub);
     if (!user) return null;
-    return { role: "staff", username: user.username, name: user.displayName, areas: toAreas(user.areas) };
+    return {
+      role: "staff",
+      level: user.role,
+      username: user.username,
+      name: user.displayName,
+      areas: toAreas(user.areas),
+    };
   }
   return null;
 }
@@ -88,6 +101,21 @@ export async function requireAdmin(area?: Area) {
   if (session.role === "owner") return null;
   if (area && session.areas.includes(area)) return null;
   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+}
+
+export function isStockManager(session: AdminSession) {
+  return session.level === "owner" || session.level === "head";
+}
+
+// Every /api/admin/stock handler calls this. "manager" means the owner or a head.
+export async function requireStock(min: "staff" | "manager" = "staff") {
+  const session = await getAdminSession();
+  if (!session) return { denied: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) } as const;
+  const hasStock = session.role === "owner" || session.areas.includes("stock");
+  if (!hasStock || (min === "manager" && !isStockManager(session))) {
+    return { denied: NextResponse.json({ error: "Only a head or the owner can do this." }, { status: 403 }) } as const;
+  }
+  return { session } as const;
 }
 
 export const ADMIN_COOKIE_NAME = COOKIE_NAME;

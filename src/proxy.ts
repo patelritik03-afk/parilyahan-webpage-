@@ -44,9 +44,11 @@ export async function proxy(request: NextRequest) {
   if (isApi) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  return NextResponse.redirect(new URL("/admin", request.url));
+  const login = new URL("/admin", request.url);
+  if (areaForPath(pathname) === "stock") login.searchParams.set("next", pathname);
+  return NextResponse.redirect(login);
 }
 
 export const config = {
-  matcher: ["/admin/dashboard/:path*", "/api/admin/:path*"],
+  matcher: ["/admin/dashboard/:path*", "/api/admin/:path*", "/stock", "/stock/:path*"],
 };

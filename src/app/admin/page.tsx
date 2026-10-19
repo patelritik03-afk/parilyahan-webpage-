@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { safeNextPath } from "@/lib/adminAreas";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -22,7 +23,8 @@ export default function AdminLoginPage() {
     });
 
     if (res.ok) {
-      router.push("/admin/dashboard/menu");
+      const next = safeNextPath(new URLSearchParams(window.location.search).get("next"));
+      router.push(next ?? "/admin/dashboard/menu");
       router.refresh();
     } else if (res.status === 429) {
       setError("Too many attempts. Please wait a few minutes and try again.");

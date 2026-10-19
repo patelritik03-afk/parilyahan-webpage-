@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import SocialLinks from "./SocialLinks";
 import { ADDRESS_LINES, CONTACT_EMAIL, MAPS_URL, PHONE_DISPLAY, PHONE_TEL, WHATSAPP_NUMBER } from "@/lib/site";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
@@ -18,8 +19,11 @@ const links: { href: string; key: TranslationKey }[] = [
 
 export default function Footer() {
   const { t } = useLanguage();
+  const pathname = usePathname();
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "Parilyahan Sa Kalye";
   const year = new Date().getFullYear();
+
+  if (pathname === "/stock" || pathname.startsWith("/stock/")) return null;
 
   return (
     <footer className="bg-header text-header-foreground">
