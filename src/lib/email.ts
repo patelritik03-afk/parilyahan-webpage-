@@ -41,13 +41,13 @@ export async function sendOwnerReservationEmail(reservation: Reservation) {
   return send({
     from,
     to,
-    replyTo: reservation.email,
+    replyTo: reservation.email || undefined,
     subject: `New reservation: ${reservation.name} - ${reservation.date} ${formatTimeLabel(reservation.time)}`,
     html: `
       <h2>New Reservation</h2>
       ${row("Name", reservation.name)}
       ${row("Phone", reservation.phone)}
-      ${row("Email", reservation.email)}
+      ${row("Email", reservation.email || "Not given")}
       ${row("Date", reservation.date)}
       ${row("Time", formatTimeLabel(reservation.time))}
       ${row("Party size", reservation.party_size)}
@@ -58,7 +58,8 @@ export async function sendOwnerReservationEmail(reservation: Reservation) {
 
 export async function sendCustomerConfirmationEmail(reservation: Reservation) {
   const from = process.env.RESEND_FROM_EMAIL;
-  if (!from) return false;
+  // The email is optional; without one there is nobody to send the confirmation to.
+  if (!from || !reservation.email) return false;
 
   return send({
     from,

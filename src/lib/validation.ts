@@ -28,6 +28,16 @@ export function upcomingDateSchema(maxDaysAhead: number, message: string) {
   }, message);
 }
 
+// An email is optional on reservations: empty is saved as "" (the column cannot be null).
+const emailCheck = z.string().email();
+export const optionalEmailSchema = z
+  .string()
+  .trim()
+  .max(200)
+  .refine((value) => value === "" || emailCheck.safeParse(value).success, "Please enter a valid email address.")
+  .optional()
+  .default("");
+
 // Bots fill every field they see; real visitors never see this one.
 export const HONEYPOT_FIELD = "website";
 

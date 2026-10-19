@@ -63,7 +63,7 @@ export default function ReservationEditor({
           </label>
           <label className="text-sm font-medium text-foreground/80">
             Email
-            <input required type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className={inputClass} />
+            <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className={inputClass} />
           </label>
           <label className="text-sm font-medium text-foreground/80">
             Date

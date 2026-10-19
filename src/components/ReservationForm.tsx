@@ -6,6 +6,7 @@ import { TIME_SLOTS, formatTimeLabel } from "@/lib/timeSlots";
 import { buildPhone } from "@/lib/countryCodes";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { HONEYPOT_FIELD } from "@/lib/validation";
+import { bookingReference, downloadReservationReceipt, type ReceiptData } from "@/lib/reservationReceipt";
 import { Field, HoneypotField, inputClass, labelClass } from "./FormField";
 import PhoneField from "./PhoneField";
 
@@ -15,9 +16,28 @@ export default function ReservationForm() {
   const { t } = useLanguage();
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [summary, setSummary] = useState<{ date: string; time: string; party_size: number } | null>(
-    null
-  );
+  const [summary, setSummary] = useState<{
+    date: string;
+    time: string;
+    party_size: number;
+    hasEmail: boolean;
+    receipt: ReceiptData | null;
+  } | null>(null);
+  const [receiptBusy, setReceiptBusy] = useState(false);
+  const [receiptError, setReceiptError] = useState(false);
+
+  async function handleDownloadReceipt() {
+    if (!summary?.receipt) return;
+    setReceiptBusy(true);
+    setReceiptError(false);
+    try {
+      await downloadReservationReceipt(summary.receipt);
+    } catch {
+      setReceiptError(true);
+    } finally {
+      setReceiptBusy(false);
+    }
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -57,7 +77,26 @@ export default function ReservationForm() {
         throw new Error(body.error ?? t("reservation.genericError"));
       }
 
-      setSummary({ date: payload.date, time: payload.time, party_size: payload.party_size });
+      const saved = await res.json().catch(() => null);
+      const reservation = saved?.reservation;
+      setSummary({
+        date: payload.date,
+        time: payload.time,
+        party_size: payload.party_size,
+        hasEmail: payload.email.trim() !== "",
+        receipt: reservation?.id
+          ? {
+              id: String(reservation.id),
+              name: payload.name.trim(),
+              phone: payload.phone,
+              date: payload.date,
+              time: payload.time,
+              party_size: payload.party_size,
+              notes: payload.notes,
+              created_at: reservation.created_at,
+            }
+          : null,
+      });
       setStatus("success");
       form.reset();
     } catch (err) {
@@ -76,7 +115,25 @@ export default function ReservationForm() {
       <div className="rounded-lg border border-primary/30 bg-primary/5 p-6 text-center">
         <h2 className="font-display text-xl font-semibold text-primary">{t("reservation.successTitle")}</h2>
         <p className="mt-2 text-foreground/90">{summaryText}</p>
-        <p className="mt-2 text-sm text-muted">{t("reservation.successNote")}</p>
+        <p className="mt-2 text-sm text-muted">
+          {summary.hasEmail ? t("reservation.successNote") : t("reservation.successNoteNoEmail")}
+        </p>
+        {summary.receipt && (
+          <>
+            <p className="mt-3 text-xs font-semibold uppercase tracking-widest text-muted">
+              {t("reservation.reference")}: {bookingReference(summary.receipt.id)}
+            </p>
+            <button
+              type="button"
+              onClick={handleDownloadReceipt}
+              disabled={receiptBusy}
+              className="mt-4 w-full rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+            >
+              {receiptBusy ? t("reservation.receiptPreparing") : t("reservation.downloadReceipt")}
+            </button>
+            {receiptError && <p className="mt-2 text-sm text-red-600">{t("reservation.genericError")}</p>}
+          </>
+        )}
         <button
           type="button"
           onClick={() => setStatus("idle")}
@@ -93,7 +150,7 @@ export default function ReservationForm() {
       <HoneypotField name={HONEYPOT_FIELD} />
       <Field label={t("reservation.fullName")} name="name" type="text" required />
       <PhoneField label={t("reservation.phone")} countryLabel={t("enquiry.countryCode")} />
-      <Field label={t("reservation.email")} name="email" type="email" required />
+      <Field label={t("reservation.emailOptional")} name="email" type="email" />
       <div className="grid gap-5 sm:grid-cols-3">
         <Field label={t("reservation.date")} name="date" type="date" required min={todayISO()} />
         <div>

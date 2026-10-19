@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/auth";
-import { isoDateSchema } from "@/lib/validation";
+import { isoDateSchema, optionalEmailSchema } from "@/lib/validation";
 import { TIME_SLOTS } from "@/lib/timeSlots";
 import { RESERVATION_STATUSES } from "@/lib/reservationStatus";
 
@@ -10,7 +10,7 @@ import { RESERVATION_STATUSES } from "@/lib/reservationStatus";
 const patchSchema = z.object({
   name: z.string().trim().min(1).max(200),
   phone: z.string().trim().min(5).max(40),
-  email: z.string().trim().email().max(200),
+  email: optionalEmailSchema,
   date: isoDateSchema,
   time: z.string().refine((val) => TIME_SLOTS.includes(val), "Please choose a valid time slot."),
   party_size: z.number().int().min(1).max(500),

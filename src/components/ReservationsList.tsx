@@ -204,7 +204,7 @@ export default function ReservationsList() {
                   <td className="py-2 pr-4 font-medium">{r.name}</td>
                   <td className="py-2 pr-4">{r.party_size}</td>
                   <td className="py-2 pr-4">{r.phone}</td>
-                  <td className="py-2 pr-4">{r.email}</td>
+                  <td className="py-2 pr-4">{r.email || "-"}</td>
                   <td className="py-2 pr-4">{statusLabel(r.status)}</td>
                   <td className="py-2 pr-4 text-muted">{r.notes || "-"}</td>
                   <td className="whitespace-nowrap py-2 text-right">
