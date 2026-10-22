@@ -1,40 +1,56 @@
 ﻿// Fixed geometry of the daily menu poster (1080x1920, a standard portrait screen / story size).
 export const POSTER_W = 1080;
 export const POSTER_H = 1920;
+export const MARGIN = 40;
+export const INNER_W = POSTER_W - 2 * MARGIN;
 
-export const PAD = 36;
-export const FOOTER_H = 150;
-export const BODY_BOTTOM_GAP = 20;
-export const COL_GAP = 24;
-
-export const LEFT_W = 424;
-export const RIGHT_W = POSTER_W - 2 * PAD - LEFT_W - COL_GAP;
-export const CONTENT_H = POSTER_H - FOOTER_H - PAD - BODY_BOTTOM_GAP;
-
-// Must match scripts/prepare-poster-assets.mjs
-// The weekend poster has the free-seafood banner, so its picture collage is shorter than the weekday one.
-export const COLLAGE_W = 424;
-export const COLLAGE_H_WEEKEND = 840;
-export const COLLAGE_H_WEEKDAY = 956;
-
-export const LOGO_W = 430;
+// Photo at the top. Must match scripts/prepare-poster-assets.mjs (pictures are 1080x640, shown cropped).
+export const HERO_H = 560;
+export const HERO_IMG_H = 640;
+export const LOGO_W = 300;
 export const LOGO_H = Math.round((LOGO_W * 377) / 900);
-export const DATE_H = 80;
 
-export const CARD_BORDER = 3;
-export const CARD_PAD = 20;
-export const COLUMN_GAP = 24;
-export const CARD_H = CONTENT_H - (LOGO_H + 10 + DATE_H + 18);
-export const CARD_INNER_W = RIGHT_W - 2 * CARD_BORDER - 2 * CARD_PAD;
-export const CARD_INNER_H = CARD_H - 2 * CARD_BORDER - 2 * CARD_PAD;
-export const COLUMN_W = Math.floor((CARD_INNER_W - COLUMN_GAP) / 2);
+// Price cards overlap the bottom of the photo.
+export const PRICE_TOP = 500;
+export const PRICE_H = 170;
+export const PRICE_GAP = 24;
+export const PRICE_W = (INNER_W - PRICE_GAP) / 2;
+export const VAT_TOP = PRICE_TOP + PRICE_H + 12;
+export const VAT_H = 30;
+export const CONTENT_TOP = VAT_TOP + VAT_H + 12;
+
+// Weekend-only "free bucket seafoods" banner.
+export const BUCKET_H = 90;
+export const BUCKET_GAP = 18;
+export const BADGE = 112;
+
+export const FOOTER_H = 160;
+export const MENU_BOTTOM = POSTER_H - FOOTER_H - 24;
+export const MENU_BORDER = 2;
+export const MENU_PAD_X = 28;
+export const MENU_PAD_Y = 24;
+export const MENU_HEADING_H = 54;
+export const MENU_INNER_W = INNER_W - 2 * MENU_BORDER - 2 * MENU_PAD_X;
+
+export function menuTop(weekend: boolean) {
+  return weekend ? CONTENT_TOP + BUCKET_H + BUCKET_GAP : CONTENT_TOP;
+}
+
+// Space the menu sections can use, inside the card and below its heading.
+export function menuBox(weekend: boolean) {
+  const cardH = MENU_BOTTOM - menuTop(weekend);
+  return { width: MENU_INNER_W, height: cardH - 2 * MENU_BORDER - 2 * MENU_PAD_Y - MENU_HEADING_H };
+}
 
 export const RED = "#c1121f";
-export const DARK = "#161616";
+export const DARK = "#171311";
 export const YELLOW = "#ffd23f";
-export const INK = "#1c1c1c";
+export const INK = "#211a16";
+export const MUTED = "#6e6259";
+export const CREAM = "#fff6e8";
+export const LINE = "#f0dfc6";
 
-// The left side of the poster never changes. Edit the wording or prices here.
+// The fixed wording of the poster. Edit the wording or prices here.
 export const POSTER_TEXT = {
   tagline: "A Feast of Asian & Global Flavors",
   weekday: { price: "39", days: "MONDAY - THURSDAY", hours: "1:00PM - 10:00PM", label: "WEEKDAYS" },

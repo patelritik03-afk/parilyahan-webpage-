@@ -1,4 +1,4 @@
-﻿import "server-only";
+import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as opentype from "opentype.js";
@@ -8,8 +8,9 @@ type FontKey = "medium" | "semibold" | "extrabold" | "extrabolditalic";
 
 export type PosterAssets = {
   logo: string;
-  collageWeekend: string;
-  collageWeekday: string;
+  heroWeekday: string;
+  heroWeekend: string;
+  bucketBadge: string;
   fonts: { name: string; data: ArrayBuffer; weight: 500 | 600 | 800; style: "normal" | "italic" }[];
   measure: Measure;
   measureFont: (text: string, size: number, font: FontKey) => number;
@@ -22,14 +23,15 @@ let cached: Promise<PosterAssets> | null = null;
 
 async function load(): Promise<PosterAssets> {
   // Literal paths so the deployment bundles these files (see outputFileTracingIncludes in next.config.ts).
-  const [medium, semibold, extrabold, extrabolditalic, logo, collageWeekend, collageWeekday] = await Promise.all([
+  const [medium, semibold, extrabold, extrabolditalic, logo, heroWeekday, heroWeekend, bucketBadge] = await Promise.all([
     readFile(join(process.cwd(), "src/assets/poster/fonts/Poppins-Medium.ttf")),
     readFile(join(process.cwd(), "src/assets/poster/fonts/Poppins-SemiBold.ttf")),
     readFile(join(process.cwd(), "src/assets/poster/fonts/Poppins-ExtraBold.ttf")),
     readFile(join(process.cwd(), "src/assets/poster/fonts/Poppins-ExtraBoldItalic.ttf")),
-    readFile(join(process.cwd(), "src/assets/poster/logo-dark.png")),
-    readFile(join(process.cwd(), "src/assets/poster/collage-weekend.jpg")),
-    readFile(join(process.cwd(), "src/assets/poster/collage-weekday.jpg")),
+    readFile(join(process.cwd(), "src/assets/poster/logo-light.png")),
+    readFile(join(process.cwd(), "src/assets/poster/hero-weekday.jpg")),
+    readFile(join(process.cwd(), "src/assets/poster/hero-weekend.jpg")),
+    readFile(join(process.cwd(), "src/assets/poster/bucket-badge.jpg")),
   ]);
 
   const parsed: Record<FontKey, opentype.Font> = {
@@ -42,8 +44,9 @@ async function load(): Promise<PosterAssets> {
 
   return {
     logo: dataUri("image/png", logo),
-    collageWeekend: dataUri("image/jpeg", collageWeekend),
-    collageWeekday: dataUri("image/jpeg", collageWeekday),
+    heroWeekday: dataUri("image/jpeg", heroWeekday),
+    heroWeekend: dataUri("image/jpeg", heroWeekend),
+    bucketBadge: dataUri("image/jpeg", bucketBadge),
     fonts: [
       { name: "Poppins", data: toArrayBuffer(medium), weight: 500, style: "normal" },
       { name: "Poppins", data: toArrayBuffer(semibold), weight: 600, style: "normal" },

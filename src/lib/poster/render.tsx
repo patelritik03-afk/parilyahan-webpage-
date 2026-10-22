@@ -3,13 +3,13 @@ import { ImageResponse } from "next/og";
 import type { MenuItem } from "@/lib/types";
 import { itemsToGroups } from "@/lib/menuSections";
 import { loadPosterAssets } from "./assets";
-import { POSTER_H, POSTER_W } from "./constants";
+import { POSTER_H, POSTER_W, menuBox } from "./constants";
 import { posterDateLabel } from "./dates";
 import { layoutMenu, type PosterGroup } from "./layout";
 import PosterTemplate, { type Fit } from "./PosterTemplate";
 
 // Draws the poster for one day's menu and returns the PNG bytes.
-// The left side is fixed artwork; only the date, weekday and menu on the right change.
+// The photo, prices and contact details are fixed; the date, weekday and menu change every day.
 export async function renderPosterPng(date: string, items: MenuItem[]): Promise<ArrayBuffer> {
   const assets = await loadPosterAssets();
 
@@ -20,7 +20,8 @@ export async function renderPosterPng(date: string, items: MenuItem[]): Promise<
     }))
     .filter((group) => group.category && group.dishes.length > 0);
 
-  const layout = layoutMenu(groups, (text, size, font) => assets.measureFont(text, size, font));
+  const label = posterDateLabel(date);
+  const layout = layoutMenu(groups, (text, size, font) => assets.measureFont(text, size, font), menuBox(label.weekend));
   if (!layout.fits) console.warn(`Poster for ${date}: menu is very long, text was shrunk to the minimum size`);
 
   const fit: Fit = (text, maxWidth, maxSize, font) => {
@@ -28,14 +29,14 @@ export async function renderPosterPng(date: string, items: MenuItem[]): Promise<
     return width <= maxWidth ? maxSize : Math.floor((maxSize * maxWidth) / width);
   };
 
-  const label = posterDateLabel(date);
   const image = new ImageResponse(
     (
       <PosterTemplate
         date={label}
         layout={layout}
         logo={assets.logo}
-        collage={label.weekend ? assets.collageWeekend : assets.collageWeekday}
+        hero={label.weekend ? assets.heroWeekend : assets.heroWeekday}
+        bucketBadge={assets.bucketBadge}
         fit={fit}
       />
     ),
