@@ -29,7 +29,8 @@ export type IconName =
   | "orders"
   | "reports"
   | "alert"
-  | "check";
+  | "check"
+  | "more";
 
 export function StockIcon({ name, ...props }: { name: IconName } & SVGProps<SVGSVGElement>) {
   switch (name) {
@@ -112,6 +113,15 @@ export function StockIcon({ name, ...props }: { name: IconName } & SVGProps<SVGS
         <Icon {...props}>
           <path d="M12 3 2 20h20L12 3Z" />
           <path d="M12 10v4M12 17h.01" />
+        </Icon>
+      );
+    case "more":
+      return (
+        <Icon {...props}>
+          <rect x="3" y="3" width="7" height="7" rx="2" />
+          <rect x="14" y="3" width="7" height="7" rx="2" />
+          <rect x="3" y="14" width="7" height="7" rx="2" />
+          <rect x="14" y="14" width="7" height="7" rx="2" />
         </Icon>
       );
     case "check":

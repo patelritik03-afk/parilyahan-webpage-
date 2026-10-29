@@ -100,3 +100,16 @@ export async function sendOwnerEnquiryEmail(enquiry: EnquiryPayload) {
     `,
   });
 }
+
+// Any notification email to the owner (used by the stock app for orders and price alerts).
+export async function sendOwnerNotificationEmail(subject: string, rows: [string, string][], heading: string) {
+  const from = process.env.RESEND_FROM_EMAIL;
+  const to = process.env.OWNER_NOTIFICATION_EMAIL;
+  if (!from || !to) return false;
+  return send({
+    from,
+    to,
+    subject,
+    html: `<h2>${escapeHtml(heading)}</h2>${rows.map(([label, value]) => row(label, value)).join("")}`,
+  });
+}

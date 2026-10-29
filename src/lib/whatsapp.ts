@@ -39,3 +39,8 @@ export function sendOwnerEnquiryWhatsApp(enquiry: EnquiryPayload) {
     enquiry.message ? `Message: ${enquiry.message}` : null,
   ]);
 }
+
+// Any short message to the owner's WhatsApp (used by the stock app for orders and price alerts).
+export function sendOwnerWhatsAppText(lines: (string | null | undefined)[]) {
+  return sendToOwner(lines);
+}

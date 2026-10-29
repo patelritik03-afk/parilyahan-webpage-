@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getAdminSession, isStockManager } from "@/lib/auth";
 import { listStockItems, listSuppliers } from "@/lib/stock/items";
+import { supabaseAdmin } from "@/lib/supabase";
+import { todayISO } from "@/lib/date";
 import { PAR_COVER_DAYS, PAR_HISTORY_DAYS, getParSuggestions } from "@/lib/stock/parSuggestions";
 import { formatAed, formatQty, type StockItem } from "@/lib/stock/types";
 import { StockIcon, type IconName } from "@/components/stock/icons";
@@ -74,7 +76,13 @@ const belowPar = (i: StockItem) => i.par_level !== null && i.qty < i.par_level;
 export default async function StockDashboard() {
   const session = await getAdminSession();
   const manager = session ? isStockManager(session) : false;
-  const [allItems, suppliers] = await Promise.all([listStockItems(manager), listSuppliers()]);
+  const [allItems, suppliers, waiting, alerts, usedToday] = await Promise.all([
+    listStockItems(manager),
+    listSuppliers(),
+    supabaseAdmin.from("purchase_orders").select("id", { count: "exact", head: true }).eq("status", "submitted"),
+    supabaseAdmin.from("price_alerts").select("id", { count: "exact", head: true }).is("seen_at", null),
+    supabaseAdmin.from("stock_movements").select("id", { count: "exact", head: true }).eq("ref_type", "usage").eq("entry_date", todayISO()),
+  ]);
   const items = allItems.filter((i) => i.active);
   const par = await getParSuggestions(new Map(items.map((i) => [i.id, i.base_unit])));
   const suggestions = items.filter((i) => {
@@ -114,7 +122,30 @@ export default async function StockDashboard() {
           href="/stock/items?below=1"
           tone={withPar === 0 ? "default" : low.length > 0 ? "warn" : "good"}
         />
-        <StatCard icon="suppliers" label="Suppliers" value={String(activeSuppliers)} href="/stock/suppliers" />
+        <StatCard
+          icon="orders"
+          label="Orders to approve"
+          value={String(waiting.count ?? 0)}
+          hint={manager ? "Waiting for a head" : "Sent for approval"}
+          href="/stock/orders"
+          tone={(waiting.count ?? 0) > 0 ? "warn" : "default"}
+        />
+        <StatCard
+          icon="usage"
+          label="Usage entries today"
+          value={String(usedToday.count ?? 0)}
+          hint={(usedToday.count ?? 0) === 0 ? "Nothing entered yet" : "Keep going"}
+          href="/stock/usage"
+        />
+        {manager && (
+          <StatCard
+            icon="alert"
+            label="New price rises"
+            value={String(alerts.count ?? 0)}
+            href="/stock/prices"
+            tone={(alerts.count ?? 0) > 0 ? "warn" : "default"}
+          />
+        )}
         {manager ? (
           <StatCard icon="reports" label="Stock value" value={formatAed(stockValue)} hint="At average cost" />
         ) : (
@@ -125,10 +156,14 @@ export default async function StockDashboard() {
       <section>
         <h2 className="font-display text-lg font-semibold">Quick actions</h2>
         <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <QuickAction href="/stock/usage" icon="usage" label="Daily usage" text="Enter what was used or wasted" />
+          <QuickAction href="/stock/bills/new" icon="bills" label="Enter a bill" text="Stock in from a supplier" />
+          <QuickAction href="/stock/orders/new" icon="orders" label="New order" text="Send for approval" />
+          <QuickAction href="/stock/count" icon="count" label="Stock check" text="Count the store" />
           <QuickAction href="/stock/items" icon="items" label="Find an item" text="Search stock by any name" />
-          <QuickAction href="/stock/items?below=1" icon="alert" label="What to buy" text="Items below par level" />
-          <QuickAction href="/stock/suppliers" icon="suppliers" label="Suppliers" text="Call or check details" />
-          {manager && <QuickAction href="/stock/import" icon="import" label="Import / Export" text="Update items in Excel" />}
+          <QuickAction href="/stock/orders/new?fromPar=1" icon="alert" label="What to buy" text="Order items below par" />
+          {manager && <QuickAction href="/stock/reports" icon="reports" label="Reports" text="Food cost and top items" />}
+          {manager && <QuickAction href="/stock/prices" icon="alert" label="Prices" text="Rises and history" />}
         </div>
       </section>
 
@@ -235,10 +270,6 @@ export default async function StockDashboard() {
         )}
       </div>
 
-      <p className="text-sm text-muted">
-        Bills, daily usage, stock checks, orders and reports are being added next. They will appear in the menu as they
-        become ready.
-      </p>
     </div>
   );
 }
