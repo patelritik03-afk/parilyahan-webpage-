@@ -68,7 +68,11 @@ export type StockItem = {
   avg_cost?: number;
   last_price?: number | null;
   has_movements?: boolean;
+  // Suggested from a month of usage records (heads and the owner only).
+  suggested_par?: number | null;
 };
+
+export type ParInfo = { daysOfRecords: number; ready: boolean; historyDays: number; coverDays: number };
 
 export type Supplier = {
   id: string;

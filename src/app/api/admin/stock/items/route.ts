@@ -2,12 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { isStockManager, requireStock } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { duplicateNameError, itemInputSchema, listStockItems } from "@/lib/stock/items";
+import { PAR_COVER_DAYS, PAR_HISTORY_DAYS, getParSuggestions } from "@/lib/stock/parSuggestions";
 
 export async function GET() {
   const auth = await requireStock();
   if ("denied" in auth) return auth.denied;
   try {
-    return NextResponse.json({ items: await listStockItems(isStockManager(auth.session)) });
+    const manager = isStockManager(auth.session);
+    const items = await listStockItems(manager);
+    if (!manager) return NextResponse.json({ items });
+
+    const par = await getParSuggestions(new Map(items.map((i) => [i.id, i.base_unit])));
+    for (const item of items) item.suggested_par = par.byItem.get(item.id) ?? null;
+    return NextResponse.json({
+      items,
+      parInfo: { daysOfRecords: par.daysOfRecords, ready: par.ready, historyDays: PAR_HISTORY_DAYS, coverDays: PAR_COVER_DAYS },
+    });
   } catch (err) {
     console.error("Could not list stock items", err);
     return NextResponse.json({ error: "Could not load the items." }, { status: 500 });

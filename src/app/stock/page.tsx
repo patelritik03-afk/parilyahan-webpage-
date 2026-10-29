@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAdminSession, isStockManager } from "@/lib/auth";
 import { listStockItems, listSuppliers } from "@/lib/stock/items";
+import { PAR_COVER_DAYS, PAR_HISTORY_DAYS, getParSuggestions } from "@/lib/stock/parSuggestions";
 import { formatAed, formatQty, type StockItem } from "@/lib/stock/types";
 import { StockIcon, type IconName } from "@/components/stock/icons";
 
@@ -75,6 +76,11 @@ export default async function StockDashboard() {
   const manager = session ? isStockManager(session) : false;
   const [allItems, suppliers] = await Promise.all([listStockItems(manager), listSuppliers()]);
   const items = allItems.filter((i) => i.active);
+  const par = await getParSuggestions(new Map(items.map((i) => [i.id, i.base_unit])));
+  const suggestions = items.filter((i) => {
+    const s = par.byItem.get(i.id);
+    return s !== undefined && s !== i.par_level;
+  }).length;
 
   const low = items.filter(belowPar).sort((a, b) => a.qty / (a.par_level || 1) - b.qty / (b.par_level || 1));
   const withPar = items.filter((i) => i.par_level !== null).length;
@@ -86,7 +92,6 @@ export default async function StockDashboard() {
   const setup = [
     { done: items.length > 0, text: `Items loaded (${items.length})`, href: "/stock/import" },
     { done: activeSuppliers > 0, text: `Suppliers added (${activeSuppliers})`, href: "/stock/suppliers" },
-    { done: withPar === items.length && items.length > 0, text: `Par levels set (${withPar} of ${items.length})`, href: "/stock/import" },
     { done: withStock > 0, text: `Opening stock entered (${withStock} of ${items.length})`, href: "/stock/import" },
   ];
 
@@ -100,12 +105,12 @@ export default async function StockDashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <StatCard icon="items" label="Items" value={String(items.length)} hint={`${withStock} in stock`} href="/stock/items" />
+        <StatCard icon="items" label="Items" value={String(items.length)} hint={`${withStock} in stock`} href="/stock/items?status=in" />
         <StatCard
           icon="alert"
           label="Below par level"
           value={String(low.length)}
-          hint={withPar === 0 ? "Set par levels to see this" : "Need buying soon"}
+          hint={withPar === 0 ? "Shown once par levels are suggested" : "Need buying soon"}
           href="/stock/items?below=1"
           tone={withPar === 0 ? "default" : low.length > 0 ? "warn" : "good"}
         />
@@ -113,7 +118,7 @@ export default async function StockDashboard() {
         {manager ? (
           <StatCard icon="reports" label="Stock value" value={formatAed(stockValue)} hint="At average cost" />
         ) : (
-          <StatCard icon="check" label="Par levels set" value={`${withPar}`} hint={`of ${items.length} items`} />
+          <StatCard icon="check" label="Usage records" value={`${Math.min(par.daysOfRecords, PAR_HISTORY_DAYS)} / ${PAR_HISTORY_DAYS}`} hint="days, for suggested par levels" />
         )}
       </div>
 
@@ -135,7 +140,7 @@ export default async function StockDashboard() {
           {low.length === 0 ? (
             <p className="mt-3 text-sm text-muted">
               {withPar === 0
-                ? "No par levels set yet. Once they are, items running low show up here."
+                ? `Par levels are suggested from ${PAR_HISTORY_DAYS} days of daily usage records. After that, items running low show up here.`
                 : "Nothing is below its par level."}
             </p>
           ) : (
@@ -165,6 +170,45 @@ export default async function StockDashboard() {
         {manager && (
           <section className="rounded-2xl border border-border bg-surface p-5">
             <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
+              <StockIcon name="reports" className="h-5 w-5 text-primary" /> Suggested par levels
+            </h2>
+            {par.ready ? (
+              <p className="mt-3 text-sm">
+                {suggestions > 0 ? (
+                  <>
+                    <span className="font-semibold">{suggestions} suggestions ready</span>, based on the last {PAR_HISTORY_DAYS} days
+                    of usage ({PAR_COVER_DAYS} days of cover).{" "}
+                    <Link href="/stock/items" className="font-semibold text-primary underline">
+                      Review them in Items
+                    </Link>
+                  </>
+                ) : (
+                  "All par levels match the latest usage."
+                )}
+              </p>
+            ) : (
+              <>
+                <p className="mt-3 text-sm text-foreground/80">
+                  Par levels are worked out from real usage, so there is nothing to fill in. After {PAR_HISTORY_DAYS} days of
+                  daily usage records, each item gets a suggested par ({PAR_COVER_DAYS} days of its average use) for you to approve.
+                </p>
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-border/60">
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${Math.min(100, (par.daysOfRecords / PAR_HISTORY_DAYS) * 100)}%` }}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-muted">
+                  {par.daysOfRecords} of {PAR_HISTORY_DAYS} days recorded
+                </p>
+              </>
+            )}
+          </section>
+        )}
+
+        {manager && (
+          <section className="rounded-2xl border border-border bg-surface p-5">
+            <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
               <StockIcon name="check" className="h-5 w-5 text-green-700" /> Getting set up
             </h2>
             <ul className="mt-3 space-y-2">
@@ -184,8 +228,8 @@ export default async function StockDashboard() {
               ))}
             </ul>
             <p className="mt-3 text-xs text-muted">
-              Tip: download the item list in Import / Export, fill in par levels, suppliers and opening stock in Excel, and
-              import it back.
+              Tip: download the item list in Import / Export, fill in units, suppliers and opening stock in Excel, and import
+              it back.
             </p>
           </section>
         )}
