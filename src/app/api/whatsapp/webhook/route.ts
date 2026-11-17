@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { sendWhatsAppText, validWebhookSignature } from "@/lib/whatsappCloud";
+import { sendWhatsAppText, trustedWebhook } from "@/lib/whatsappCloud";
 
 // Meta checks the webhook once with a GET (hub.challenge).
 export async function GET(request: NextRequest) {
@@ -57,8 +57,8 @@ async function handle(message: InboundMessage) {
 
 export async function POST(request: NextRequest) {
   const raw = await request.text();
-  if (!validWebhookSignature(raw, request.headers.get("x-hub-signature-256"))) {
-    return new NextResponse("Invalid signature", { status: 401 });
+  if (!trustedWebhook(raw, request.headers, request.nextUrl.searchParams.get("key"))) {
+    return new NextResponse("Not trusted", { status: 401 });
   }
   let payload: { entry?: { changes?: { value?: { messages?: InboundMessage[] } }[] }[] };
   try {
