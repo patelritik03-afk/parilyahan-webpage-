@@ -6,6 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import LanguageToggle from "./LanguageToggle";
+import { useSpinCampaign } from "./spin/useSpinCampaign";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
 const links: { href: string; key: TranslationKey }[] = [
@@ -21,6 +22,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const { t } = useLanguage();
+  const spin = useSpinCampaign();
 
   // The stock app has its own header.
   if (pathname === "/stock" || pathname.startsWith("/stock/") || pathname === "/spin/kiosk") return null;
@@ -52,6 +54,14 @@ export default function Navbar() {
               {t(link.key)}
             </Link>
           ))}
+          {spin && (
+            <Link
+              href="/spin?src=menu"
+              className="rounded-full bg-gradient-to-b from-[#ffe27a] to-[#f2b705] px-4 py-1.5 text-sm font-black uppercase text-[#5a1a00] shadow-[0_0_14px_rgba(255,215,0,0.6)] hover:scale-105"
+            >
+              🎡 Spin &amp; Win
+            </Link>
+          )}
           <LanguageToggle />
           <Link
             href="/reservation"
@@ -92,6 +102,15 @@ export default function Navbar() {
               {t(link.key)}
             </Link>
           ))}
+          {spin && (
+            <Link
+              href="/spin?src=menu"
+              onClick={() => setOpen(false)}
+              className="mt-1 rounded-full bg-gradient-to-b from-[#ffe27a] to-[#f2b705] px-5 py-2 text-center text-sm font-black uppercase text-[#5a1a00]"
+            >
+              🎡 Spin &amp; Win
+            </Link>
+          )}
           <Link
             href="/reservation"
             onClick={() => setOpen(false)}

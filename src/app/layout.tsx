@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SpinBanner from "@/components/spin/SpinBanner";
+import SpinFloatingButton from "@/components/spin/SpinFloatingButton";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { SITE_URL } from "@/lib/siteUrl";
 import "./globals.css";
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
+          <SpinFloatingButton />
         </LanguageProvider>
         <Analytics />
       </body>
