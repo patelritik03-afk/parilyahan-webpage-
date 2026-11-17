@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { SPIN_TEXT, type PublicCampaign } from "@/lib/spin/text";
 import Wheel from "./Wheel";
+import TicketCallout from "./TicketCallout";
 
 // Big Spin & Win block on the home page (only while a campaign is switched on with the banner).
 export default function SpinPromo({ campaign }: { campaign: PublicCampaign | null }) {
@@ -34,8 +35,11 @@ export default function SpinPromo({ campaign }: { campaign: PublicCampaign | nul
             {T.title}
           </h2>
           <p className="mt-4 text-lg font-semibold">{T.subtitle}</p>
-          <ul className="mt-5 space-y-2 text-left">
-            {jackpots.map((p) => (
+          <div className="mt-5 md:mx-0">
+            <TicketCallout lang={lang} size="lg" />
+          </div>
+          <ul className="mt-4 space-y-2 text-left">
+            {jackpots.filter((p) => !p.emoji.includes("✈")).map((p) => (
               <li key={p.position} className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-2.5 font-semibold ring-1 ring-amber-300/40">
                 <span className="text-2xl">{p.emoji}</span>
                 {lang === "tl" ? p.label_tl : p.label_en}

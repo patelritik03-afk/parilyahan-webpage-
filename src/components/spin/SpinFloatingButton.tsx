@@ -23,7 +23,10 @@ export default function SpinFloatingButton() {
       <span className="inline-block animate-[spin_5s_linear_infinite] text-3xl leading-none motion-reduce:animate-none" aria-hidden>
         🎡
       </span>
-      <span className="text-sm">{SPIN_TEXT[lang].bannerCta}!</span>
+      <span className="flex flex-col leading-tight">
+        <span className="text-sm">{SPIN_TEXT[lang].floatCta} ✈️</span>
+        <span className="text-[10px] font-bold normal-case opacity-80">Spin &amp; Win</span>
+      </span>
     </Link>
   );
 }

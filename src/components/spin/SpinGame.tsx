@@ -8,6 +8,7 @@ import { HONEYPOT_FIELD } from "@/lib/validation";
 import { SPIN_TEXT, type PublicCampaign, type SpinLang } from "@/lib/spin/text";
 import Wheel, { landingRotation } from "./Wheel";
 import Keypad from "./Keypad";
+import TicketCallout from "./TicketCallout";
 import { confetti, fanfare, tick, unlockAudio } from "./effects";
 
 type Step = "intro" | "name" | "phone" | "verify" | "spin" | "result" | "already";
@@ -428,9 +429,9 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
             {step === "intro" && (
               <>
                 <p className={`mt-3 font-semibold text-white/90 ${big}`}>{T.subtitle}</p>
-                <p className="mx-auto mt-3 inline-block rounded-full bg-black/30 px-4 py-2 text-sm font-bold text-amber-200 ring-1 ring-amber-300/40">
-                  {T.teaser}
-                </p>
+                <div className="mt-5">
+                  <TicketCallout lang={lang} size={kiosk ? "lg" : "md"} />
+                </div>
               </>
             )}
           </header>
