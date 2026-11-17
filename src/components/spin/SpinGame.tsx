@@ -28,6 +28,28 @@ const RESULT_RESET_MS = 20_000;
 const fmtDate = (iso: string, lang: SpinLang) =>
   new Date(`${iso}T00:00:00`).toLocaleDateString(lang === "tl" ? "fil-PH" : "en-GB", { day: "numeric", month: "long", year: "numeric" });
 
+// A verification in progress is remembered for a while, so a player who comes back from WhatsApp
+// (even in another tab, or after the phone reloaded the page) carries on where they were.
+const PENDING_KEY = "psk_spin_pending";
+const PENDING_MS = 15 * 60_000;
+function savePending(v: Verify | null) {
+  try {
+    if (v) localStorage.setItem(PENDING_KEY, JSON.stringify({ ...v, at: Date.now() }));
+    else localStorage.removeItem(PENDING_KEY);
+  } catch {
+    // storage blocked: the page still works while it stays open
+  }
+}
+function loadPending(): Verify | null {
+  try {
+    const v = JSON.parse(localStorage.getItem(PENDING_KEY) ?? "null");
+    if (v?.token && Date.now() - Number(v.at) < PENDING_MS) return v as Verify;
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 // Ease-out with a long, dramatic slow-down at the end.
 const ease = (t: number) => 1 - Math.pow(1 - t, 4.2);
 
@@ -60,7 +82,10 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
   const prizes = campaign?.prizes ?? [];
   const running = Boolean(campaign?.running);
 
+  const [nudge, setNudge] = useState(0);
+
   const reset = useCallback(() => {
+    savePending(null);
     setStep("intro");
     setName("");
     setDial(DEFAULT_DIAL_CODE);
@@ -125,6 +150,17 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
     };
   }, [kiosk]);
 
+  // Coming back to /spin with a verification still open: continue it (not on the restaurant screen).
+  useEffect(() => {
+    if (kiosk) return;
+    const pending = loadPending();
+    if (!pending) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- restores the player's progress once on open
+    setVerify(pending);
+    setTyped(pending.mode === "typed");
+    setStep("verify");
+  }, [kiosk]);
+
   async function start() {
     setBusy(true);
     setError("");
@@ -149,11 +185,14 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
         return;
       }
       if (json.already) {
+        savePending(null);
         setAlreadyAt(json.wonAt ?? null);
         setStep("already");
         return;
       }
-      setVerify({ token: json.token, mode: json.mode, message: json.message, waLink: json.waLink });
+      const next: Verify = { token: json.token, mode: json.mode, message: json.message, waLink: json.waLink };
+      setVerify(next);
+      if (!kiosk) savePending(next);
       setTyped(json.mode === "typed");
       setInfo(json.mode === "typed" ? T.codeSent : "");
       setCode("");
@@ -179,19 +218,25 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
           setError("");
           setStep("spin");
         } else if (json.expired) setExpired(true);
+        else if (json.error === "bad-token") reset();
       } catch {
         // try again on the next tick
       }
     };
+    check();
     const timer = setInterval(check, 2000);
     const onVisible = () => document.visibilityState === "visible" && check();
     document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    window.addEventListener("pageshow", onVisible);
     return () => {
       stop = true;
       clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+      window.removeEventListener("pageshow", onVisible);
     };
-  }, [step, verify, expired, T.verified]);
+  }, [step, verify, expired, nudge, reset, T.verified]);
 
   async function sendCode() {
     if (!verify) return;
@@ -244,6 +289,7 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
         if (json.error === "already") {
+          savePending(null);
           setStep("already");
         } else if (json.error === "not-verified") {
           setStep("verify");
@@ -275,6 +321,7 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
         requestAnimationFrame(frame);
       });
       setWin(result);
+      savePending(null);
       fanfare(result.jackpot);
       confetti(result.jackpot);
       if (result.jackpot) setTimeout(() => confetti(true), 900);
@@ -598,10 +645,9 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
             ) : (
               <div className="space-y-4">
                 <p className="text-white/90">{T.verifyPhone}</p>
+                {/* Same tab: WhatsApp opens on top, and coming back lands on this page again. */}
                 <a
                   href={verify.waLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-4 text-xl font-black text-white shadow-[0_6px_0_#128C7E,0_14px_30px_rgba(0,0,0,0.35)] active:translate-y-1"
                 >
                   <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor" aria-hidden>
@@ -622,10 +668,21 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
               </div>
             )}
             {!expired && !typed && (
-              <p className="flex items-center justify-center gap-2 text-sm text-white/75">
-                <span className="inline-block h-3 w-3 animate-ping rounded-full bg-green-400" />
-                {T.waiting}
-              </p>
+              <>
+                <p className="flex items-center justify-center gap-2 text-sm text-white/75">
+                  <span className="inline-block h-3 w-3 animate-ping rounded-full bg-green-400" />
+                  {T.waiting}
+                </p>
+                {!kiosk && (
+                  <button
+                    type="button"
+                    onClick={() => setNudge((n) => n + 1)}
+                    className="w-full rounded-full border-2 border-white/40 px-6 py-3 font-bold text-white hover:bg-white/10"
+                  >
+                    {T.sentIt}
+                  </button>
+                )}
+              </>
             )}
             {error && <p className="rounded-xl bg-red-950/60 p-3 text-sm font-semibold">{error}</p>}
           </div>
