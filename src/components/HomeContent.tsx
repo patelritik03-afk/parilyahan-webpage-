@@ -9,6 +9,8 @@ import ReviewsSection from "./ReviewsSection";
 import OffersSection from "./OffersSection";
 import VideoGrid, { type VideoCard } from "./VideoGrid";
 import type { Offer } from "@/lib/offers";
+import type { PublicCampaign } from "@/lib/spin/text";
+import SpinPromo from "./spin/SpinPromo";
 
 const FEATURED = ["Busog Lusog", "Kare Kare", "Grilled Chicken Feet", "Adobong Alimango", "Lumpiang Shanghai", "Chicken Inasal"];
 
@@ -26,10 +28,12 @@ export default function HomeContent({
   reviews,
   videos = [],
   offers = [],
+  spin = null,
 }: {
   reviews: ReviewData;
   videos?: VideoCard[];
   offers?: Offer[];
+  spin?: PublicCampaign | null;
 }) {
   const { t } = useLanguage();
 
@@ -78,6 +82,8 @@ export default function HomeContent({
           </div>
         </div>
       </section>
+
+      <SpinPromo campaign={spin} />
 
       <OffersSection offers={offers} />
 

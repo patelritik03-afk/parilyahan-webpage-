@@ -26,6 +26,7 @@ export function sendOwnerWhatsAppNotification(reservation: Reservation) {
     `${reservation.date} at ${formatTimeLabel(reservation.time)}, party of ${reservation.party_size}`,
     `Phone: ${reservation.phone}`,
     reservation.notes ? `Notes: ${reservation.notes}` : null,
+    reservation.coupon_code ? `Spin & Win code: ${reservation.coupon_code}` : null,
   ]);
 }
 

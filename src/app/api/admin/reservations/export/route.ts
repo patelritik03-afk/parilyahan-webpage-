@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
     { header: "Email", key: "email", width: 30 },
     { header: "Status", key: "status", width: 12 },
     { header: "Notes", key: "notes", width: 40 },
+    { header: "Spin & Win code", key: "coupon", width: 18 },
     { header: "Booked on", key: "created", width: 18 },
   ];
   sheet.getRow(1).font = { bold: true };
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
       email: r.email,
       status: statusLabel(r.status),
       notes: r.notes ?? "",
+      coupon: r.coupon_code ?? "",
       created: r.created_at.slice(0, 16).replace("T", " "),
     });
   }

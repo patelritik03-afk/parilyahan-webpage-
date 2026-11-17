@@ -118,4 +118,16 @@ export async function requireStock(min: "staff" | "manager" = "staff") {
   return { session } as const;
 }
 
+// Spin & Win: staff with the area redeem coupons; heads and the owner manage the contest;
+// verification settings are the owner's.
+export async function requireSpin(min: "staff" | "manager" | "owner" = "staff") {
+  const session = await getAdminSession();
+  if (!session) return { denied: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) } as const;
+  const hasArea = session.role === "owner" || session.areas.includes("spin");
+  const allowed =
+    hasArea && (min === "staff" || (min === "manager" && isStockManager(session)) || (min === "owner" && session.role === "owner"));
+  if (!allowed) return { denied: NextResponse.json({ error: "You don't have access to this." }, { status: 403 }) } as const;
+  return { session } as const;
+}
+
 export const ADMIN_COOKIE_NAME = COOKIE_NAME;

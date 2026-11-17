@@ -9,6 +9,7 @@ import { HONEYPOT_FIELD } from "@/lib/validation";
 import { bookingReference, downloadReservationReceipt, type ReceiptData } from "@/lib/reservationReceipt";
 import { Field, HoneypotField, inputClass, labelClass } from "./FormField";
 import PhoneField from "./PhoneField";
+import { SpinCouponField, SpinInvite } from "./spin/SpinCouponField";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -21,6 +22,7 @@ export default function ReservationForm() {
     time: string;
     party_size: number;
     hasEmail: boolean;
+    hasCoupon: boolean;
     receipt: ReceiptData | null;
   } | null>(null);
   const [receiptBusy, setReceiptBusy] = useState(false);
@@ -62,6 +64,7 @@ export default function ReservationForm() {
       time: String(data.time ?? ""),
       party_size: Number(data.party_size ?? 0),
       notes: String(data.notes ?? ""),
+      coupon_code: String(data.coupon_code ?? ""),
       [HONEYPOT_FIELD]: String(data[HONEYPOT_FIELD] ?? ""),
     };
 
@@ -84,6 +87,7 @@ export default function ReservationForm() {
         time: payload.time,
         party_size: payload.party_size,
         hasEmail: payload.email.trim() !== "",
+        hasCoupon: Boolean(reservation?.coupon_code),
         receipt: reservation?.id
           ? {
               id: String(reservation.id),
@@ -141,6 +145,7 @@ export default function ReservationForm() {
         >
           {t("reservation.another")}
         </button>
+        {!summary.hasCoupon && <SpinInvite />}
       </div>
     );
   }
@@ -182,6 +187,8 @@ export default function ReservationForm() {
           placeholder={t("reservation.notesPlaceholder")}
         />
       </div>
+
+      <SpinCouponField />
 
       {status === "error" && <p className="text-sm text-red-600">{errorMessage}</p>}
 

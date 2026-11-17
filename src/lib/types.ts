@@ -21,6 +21,7 @@ export type Reservation = {
   notes: string | null;
   status: string;
   created_at: string;
+  coupon_code?: string | null;
 };
 
 export type Enquiry = {

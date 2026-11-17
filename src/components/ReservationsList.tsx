@@ -206,7 +206,12 @@ export default function ReservationsList() {
                   <td className="py-2 pr-4">{r.phone}</td>
                   <td className="py-2 pr-4">{r.email || "-"}</td>
                   <td className="py-2 pr-4">{statusLabel(r.status)}</td>
-                  <td className="py-2 pr-4 text-muted">{r.notes || "-"}</td>
+                  <td className="py-2 pr-4 text-muted">
+                    {r.notes || (r.coupon_code ? "" : "-")}
+                    {r.coupon_code && (
+                      <span className="mt-1 block w-fit rounded-full bg-amber-100 px-2 py-0.5 font-mono text-xs font-bold text-amber-900">🎡 {r.coupon_code}</span>
+                    )}
+                  </td>
                   <td className="whitespace-nowrap py-2 text-right">
                     <button type="button" onClick={() => setEditing(r)} className="mr-3 font-medium text-primary hover:underline">
                       Edit

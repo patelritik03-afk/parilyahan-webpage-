@@ -52,6 +52,7 @@ export async function sendOwnerReservationEmail(reservation: Reservation) {
       ${row("Time", formatTimeLabel(reservation.time))}
       ${row("Party size", reservation.party_size)}
       ${row("Notes", reservation.notes ?? "")}
+      ${reservation.coupon_code ? row("Spin & Win code", reservation.coupon_code) : ""}
     `,
   });
 }

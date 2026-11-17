@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { Area } from "@/lib/adminAreas";
 
@@ -11,6 +12,7 @@ const tabs: { href: string; label: string; area?: Area; staffOnly?: boolean }[] 
   { href: "/admin/dashboard/offers", label: "Offers" },
   { href: "/admin/dashboard/reservations", label: "Reservations", area: "reservations" },
   { href: "/stock", label: "Stock", area: "stock" },
+  { href: "/admin/dashboard/spin", label: "Spin & Win", area: "spin" },
   { href: "/admin/dashboard/enquiries", label: "Enquiries" },
   { href: "/admin/dashboard/gallery", label: "Gallery" },
   { href: "/admin/dashboard/reviews", label: "Reviews" },
@@ -34,6 +36,25 @@ export default function DashboardNav({
   const visibleTabs = tabs.filter((tab) =>
     ownerAccess ? !tab.staffOnly : tab.staffOnly || (tab.area !== undefined && areas.includes(tab.area))
   );
+  const showSpin = visibleTabs.some((tab) => tab.area === "spin");
+  const [newWins, setNewWins] = useState(0);
+
+  // New Spin & Win coupons since someone last opened the coupon list.
+  useEffect(() => {
+    if (!showSpin) return;
+    let stop = false;
+    const load = () =>
+      fetch("/api/admin/spin?count=1")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => !stop && d && setNewWins(Number(d.unseen) || 0))
+        .catch(() => {});
+    load();
+    const timer = setInterval(load, 60_000);
+    return () => {
+      stop = true;
+      clearInterval(timer);
+    };
+  }, [showSpin, pathname]);
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -55,6 +76,9 @@ export default function DashboardNav({
             }`}
           >
             {tab.label}
+            {tab.area === "spin" && newWins > 0 && (
+              <span className="ml-1.5 rounded-full bg-red-600 px-1.5 py-0.5 text-[11px] font-bold text-white">{newWins}</span>
+            )}
           </Link>
         ))}
       </nav>

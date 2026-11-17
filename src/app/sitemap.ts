@@ -8,6 +8,7 @@ const PAGES: { path: string; priority: number; changeFrequency: MetadataRoute.Si
   { path: "/filipino-buffet-jumeirah", priority: 0.8, changeFrequency: "monthly" },
   { path: "/weekend-seafood-buffet-dubai", priority: 0.8, changeFrequency: "monthly" },
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/spin", priority: 0.7, changeFrequency: "weekly" },
   { path: "/gallery", priority: 0.7, changeFrequency: "weekly" },
   { path: "/videos", priority: 0.6, changeFrequency: "weekly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },

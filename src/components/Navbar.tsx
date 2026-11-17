@@ -23,7 +23,7 @@ export default function Navbar() {
   const { t } = useLanguage();
 
   // The stock app has its own header.
-  if (pathname === "/stock" || pathname.startsWith("/stock/")) return null;
+  if (pathname === "/stock" || pathname.startsWith("/stock/") || pathname === "/spin/kiosk") return null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-header/95 text-header-foreground backdrop-blur">

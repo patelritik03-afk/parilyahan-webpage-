@@ -27,7 +27,7 @@ async function buildPdf(reservations: Reservation[], filterText: string) {
       r.phone,
       r.email,
       statusLabel(r.status),
-      r.notes ?? "",
+      [r.notes ?? "", r.coupon_code ? `Spin & Win: ${r.coupon_code}` : ""].filter(Boolean).join(" | "),
     ]),
     foot: [["", "", "Total", String(guests), "", "", "", ""]],
     styles: { fontSize: 9, cellPadding: 4, overflow: "linebreak" },

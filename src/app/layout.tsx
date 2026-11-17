@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SpinBanner from "@/components/spin/SpinBanner";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { SITE_URL } from "@/lib/siteUrl";
 import "./globals.css";
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <LanguageProvider>
+          <SpinBanner />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />

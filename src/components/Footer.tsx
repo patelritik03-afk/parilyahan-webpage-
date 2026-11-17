@@ -23,7 +23,7 @@ export default function Footer() {
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "Parilyahan Sa Kalye";
   const year = new Date().getFullYear();
 
-  if (pathname === "/stock" || pathname.startsWith("/stock/")) return null;
+  if (pathname === "/stock" || pathname.startsWith("/stock/") || pathname === "/spin/kiosk") return null;
 
   return (
     <footer className="bg-header text-header-foreground">

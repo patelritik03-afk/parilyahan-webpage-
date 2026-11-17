@@ -1,7 +1,7 @@
 // Shared by the proxy (edge-safe, no server-only imports) and the server code.
 // The owner can open everything; a staff account only the areas ticked on it.
 
-export const AREAS = ["menu", "name-tags", "reservations", "stock"] as const;
+export const AREAS = ["menu", "name-tags", "reservations", "stock", "spin"] as const;
 export type Area = (typeof AREAS)[number];
 
 export const AREA_LABELS: Record<Area, string> = {
@@ -9,6 +9,7 @@ export const AREA_LABELS: Record<Area, string> = {
   "name-tags": "Name Tags",
   reservations: "Reservations",
   stock: "Stock",
+  spin: "Spin & Win",
 };
 
 // A "head" approves orders and stock checks, sets par levels and sees costs; "staff" make entries.
