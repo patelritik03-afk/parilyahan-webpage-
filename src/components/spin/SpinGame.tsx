@@ -732,6 +732,9 @@ export default function SpinGame({ campaign, source, kiosk = false }: { campaign
               </p>
             </div>
             {win.whatsappSent && <p className="font-semibold text-green-300">{T.sentWhatsApp}</p>}
+            <p className="mx-auto max-w-sm rounded-2xl bg-amber-300/15 px-4 py-3 text-sm font-bold text-amber-100 ring-1 ring-amber-300/50">
+              {T.storyNote}
+            </p>
             <p className="text-sm text-white/75">{T.showCounter}</p>
             {kiosk ? (
               <button type="button" className={`${goldBtn} text-2xl`} onClick={reset}>
